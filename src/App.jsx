@@ -1040,12 +1040,28 @@ function JournalPage({
   };
 
   const sectionTitle = {
-    fontSize: "13px",
-    fontWeight: "700",
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "12px 14px",
+    borderRadius: "16px",
+    background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
+    border: "1px solid #dbeafe",
+    boxShadow: "0 8px 18px rgba(37, 99, 235, 0.06)",
+    fontSize: "12px",
+    fontWeight: "800",
     color: "#1d4ed8",
     textTransform: "uppercase",
-    letterSpacing: "0.08em",
-    marginBottom: "16px"
+    letterSpacing: "0.09em",
+    marginBottom: "18px"
+  };
+
+  const sectionTitleDot = {
+    width: "9px",
+    height: "9px",
+    borderRadius: "999px",
+    background: "linear-gradient(135deg, #2563eb 0%, #22c55e 100%)",
+    boxShadow: "0 0 0 5px rgba(37, 99, 235, 0.1)"
   };
 
   const managerBox = {
@@ -1131,7 +1147,10 @@ function JournalPage({
       )}
 
       <div style={formCard}>
-        <div style={sectionTitle}>Trade Details</div>
+        <div style={sectionTitle}>
+          <span style={sectionTitleDot} />
+          <span>Trade Details</span>
+        </div>
 
         <div style={row}>
           <div style={field}>
@@ -1221,7 +1240,10 @@ function JournalPage({
           </div>
         )}
 
-        <div style={{ ...sectionTitle, marginTop: "10px" }}>Mindset Snapshot</div>
+        <div style={{ ...sectionTitle, marginTop: "16px" }}>
+          <span style={sectionTitleDot} />
+          <span>Mindset Snapshot</span>
+        </div>
 
         <div style={row}>
           <div style={field}>
@@ -1294,7 +1316,10 @@ function JournalPage({
           </div>
         )}
 
-        <div style={{ ...sectionTitle, marginTop: "10px" }}>Risk and Review</div>
+        <div style={{ ...sectionTitle, marginTop: "16px" }}>
+          <span style={sectionTitleDot} />
+          <span>Risk and Review</span>
+        </div>
 
         <div style={row}>
           <div style={field}>
