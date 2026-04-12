@@ -742,8 +742,8 @@ function AnalyticsPage({ trades, btn }) {
       </div>
 
       <div style={filterCard}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
-          <div>
+        <div style={{ position: "relative", marginBottom: "14px", textAlign: "center" }}>
+          <div style={{ maxWidth: "560px", margin: "0 auto" }}>
             <div style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a" }}>Filters</div>
             <div style={{ color: "#64748b", fontSize: "13px", marginTop: "4px" }}>
               Narrow the dashboard to the trades you want to analyze.
@@ -752,7 +752,7 @@ function AnalyticsPage({ trades, btn }) {
           {hasActiveFilters && (
             <button
               onClick={() => setFilters({ startDate: "", endDate: "", instrument: "", strategy: "" })}
-              style={{ ...btn, background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
+              style={{ ...btn, position: "absolute", right: 0, top: 0, background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
             >
               Clear Filters
             </button>
