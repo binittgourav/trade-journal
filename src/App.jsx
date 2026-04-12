@@ -30,6 +30,11 @@ const safeNumber = (value) => {
 
 const formatNumber = (value) => safeNumber(value).toFixed(2);
 
+const escapeCsvValue = (value) => {
+  const text = value === null || value === undefined ? "" : String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+};
+
 const weekdayOrder = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const getWeekdayFromISODate = (value) => {
@@ -1034,6 +1039,7 @@ function JournalPage({
   cancelEditTrade,
   startEditTrade,
   deleteTrade,
+  exportTradesCsv,
   setShowStrategyBox,
   setShowEmotionBox,
   setNewStrategy,
@@ -1418,7 +1424,23 @@ function JournalPage({
       </div>
 
       <div style={{ marginTop: "24px" }}>
-        <h3 style={{ color: "#0f172a", marginBottom: "14px" }}>Saved Trades</h3>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
+          <h3 style={{ color: "#0f172a", margin: 0 }}>Saved Trades</h3>
+          <button
+            type="button"
+            onClick={exportTradesCsv}
+            disabled={trades.length === 0}
+            style={{
+              ...btn,
+              background: trades.length === 0 ? "#e2e8f0" : "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)",
+              color: trades.length === 0 ? "#64748b" : "white",
+              boxShadow: trades.length === 0 ? "none" : "0 10px 22px rgba(20, 184, 166, 0.2)",
+              opacity: trades.length === 0 ? 0.65 : 1
+            }}
+          >
+            Export CSV
+          </button>
+        </div>
 
         {trades.length === 0 ? (
           <p style={{ color: "#666", fontSize: "14px" }}>No trades saved yet.</p>
@@ -2093,6 +2115,66 @@ export default function App() {
     }
   };
 
+  const exportTradesCsv = () => {
+    const rows = getSortedTrades(trades);
+
+    if (!rows.length) {
+      return;
+    }
+
+    const headers = [
+      "Date",
+      "Instrument",
+      "Entry Time",
+      "Exit Time",
+      "Entry",
+      "Exit",
+      "Quantity",
+      "Strategy",
+      "Emotion Before",
+      "Emotion During",
+      "Emotion After",
+      "Stop Loss",
+      "Target",
+      "Planned Trade",
+      "Rating",
+      "P&L"
+    ];
+
+    const csvRows = rows.map((trade) =>
+      [
+        trade.date,
+        trade.instrument,
+        trade.entryTime,
+        trade.exitTime,
+        trade.entry,
+        trade.exit,
+        trade.quantity,
+        trade.strategy,
+        trade.before,
+        trade.during,
+        trade.after,
+        trade.sl,
+        trade.target,
+        trade.plannedTrade,
+        trade.rating,
+        formatNumber(trade.pnl)
+      ]
+        .map(escapeCsvValue)
+        .join(",")
+    );
+
+    const csv = [headers.map(escapeCsvValue).join(","), ...csvRows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = `trade-journal-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   const addStrategy = async () => {
     if (!supabase || !session?.user?.id) {
       return;
@@ -2228,6 +2310,7 @@ export default function App() {
       cancelEditTrade={cancelEditTrade}
       startEditTrade={startEditTrade}
       deleteTrade={deleteTrade}
+      exportTradesCsv={exportTradesCsv}
       setShowStrategyBox={setShowStrategyBox}
       setShowEmotionBox={setShowEmotionBox}
       setNewStrategy={setNewStrategy}
