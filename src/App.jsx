@@ -878,10 +878,7 @@ function AnalyticsPage({ trades, btn }) {
       )}
 
       <div style={{ marginBottom: "24px" }}>
-        <div style={sectionTitle}>
-          <span style={sectionTitleDot} />
-          <span>P&amp;L Analysis</span>
-        </div>
+        <div style={{ fontSize: "18px", fontWeight: "700", color: "#0f172a", marginBottom: "14px" }}>P&amp;L Analysis</div>
         <div style={{ ...card, marginBottom: "16px", padding: "16px 18px" }}>
           <div style={{ display: "grid", gap: "14px" }}>
             <div>
