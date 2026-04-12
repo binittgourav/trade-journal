@@ -30,6 +30,8 @@ const safeNumber = (value) => {
 
 const formatNumber = (value) => safeNumber(value).toFixed(2);
 
+const todayDate = new Date().toISOString().slice(0, 10);
+
 const escapeCsvValue = (value) => {
   const text = value === null || value === undefined ? "" : String(value);
   return `"${text.replaceAll('"', '""')}"`;
@@ -779,6 +781,7 @@ function AnalyticsPage({ trades, btn }) {
             <input
               type="date"
               value={filters.startDate}
+              max={todayDate}
               onChange={(e) => setFilters({ ...filters, startDate: e.target.value })}
               style={filterInput}
             />
@@ -788,6 +791,7 @@ function AnalyticsPage({ trades, btn }) {
             <input
               type="date"
               value={filters.endDate}
+              max={todayDate}
               onChange={(e) => setFilters({ ...filters, endDate: e.target.value })}
               style={filterInput}
             />
@@ -1202,7 +1206,7 @@ function JournalPage({
         <div style={row}>
           <div style={field}>
             <label style={labelStyle}>Date *</label>
-            <input name="date" value={form.date} onChange={handleChange} style={input} type="date" />
+            <input name="date" value={form.date} onChange={handleChange} style={input} type="date" max={todayDate} />
           </div>
           <div style={field}>
             <label style={labelStyle}>Instrument *</label>
@@ -1436,6 +1440,7 @@ function JournalPage({
               <input
                 type="date"
                 value={exportStartDate}
+                max={todayDate}
                 onChange={(event) => setExportStartDate(event.target.value)}
                 style={{ ...input, padding: "10px 12px", minWidth: "150px" }}
               />
@@ -1445,6 +1450,7 @@ function JournalPage({
               <input
                 type="date"
                 value={exportEndDate}
+                max={todayDate}
                 onChange={(event) => setExportEndDate(event.target.value)}
                 style={{ ...input, padding: "10px 12px", minWidth: "150px" }}
               />
@@ -1998,7 +2004,14 @@ export default function App() {
   }, []);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "date" && value > todayDate) {
+      setForm({ ...form, [name]: todayDate });
+      return;
+    }
+
+    setForm({ ...form, [name]: value });
   };
 
   const handleAuth = async () => {
