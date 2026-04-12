@@ -5,6 +5,10 @@ create table if not exists public.trades (
   user_id uuid not null references auth.users(id) on delete cascade,
   trade_date date not null,
   instrument text not null,
+  instrument_type text not null default 'Stocks' check (instrument_type in ('Stocks', 'Futures', 'Options')),
+  option_strike numeric(12, 2),
+  option_type text check (option_type in ('CE', 'PE') or option_type is null),
+  futures_expiry_month text,
   entry_time time not null,
   exit_time time not null,
   entry_price numeric(12, 2) not null,
@@ -23,6 +27,18 @@ create table if not exists public.trades (
 
 alter table public.trades
 add column if not exists planned_trade text check (planned_trade in ('Yes', 'No') or planned_trade is null);
+
+alter table public.trades
+add column if not exists instrument_type text not null default 'Stocks' check (instrument_type in ('Stocks', 'Futures', 'Options'));
+
+alter table public.trades
+add column if not exists option_strike numeric(12, 2);
+
+alter table public.trades
+add column if not exists option_type text check (option_type in ('CE', 'PE') or option_type is null);
+
+alter table public.trades
+add column if not exists futures_expiry_month text;
 
 create table if not exists public.strategies (
   id uuid primary key default gen_random_uuid(),

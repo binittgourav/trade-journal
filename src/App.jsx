@@ -4,6 +4,10 @@ import { createClient } from "@supabase/supabase-js";
 const emptyForm = {
   date: "",
   instrument: "",
+  instrumentType: "Stocks",
+  optionStrike: "",
+  optionType: "",
+  futuresExpiryMonth: "",
   entryTime: "",
   exitTime: "",
   entry: "",
@@ -56,6 +60,10 @@ const getWeekdayFromISODate = (value) => {
 const toTradeRecord = (form) => ({
   trade_date: form.date,
   instrument: form.instrument.trim(),
+  instrument_type: form.instrumentType || "Stocks",
+  option_strike: form.instrumentType === "Options" && form.optionStrike ? safeNumber(form.optionStrike) : null,
+  option_type: form.instrumentType === "Options" ? form.optionType || null : null,
+  futures_expiry_month: form.instrumentType === "Futures" ? form.futuresExpiryMonth || null : null,
   entry_time: form.entryTime,
   exit_time: form.exitTime,
   entry_price: safeNumber(form.entry),
@@ -75,6 +83,10 @@ const fromTradeRecord = (trade) => ({
   id: trade.id,
   date: trade.trade_date || "",
   instrument: trade.instrument || "",
+  instrumentType: trade.instrument_type || "Stocks",
+  optionStrike: trade.option_strike?.toString?.() ?? "",
+  optionType: trade.option_type || "",
+  futuresExpiryMonth: trade.futures_expiry_month || "",
   entryTime: trade.entry_time || "",
   exitTime: trade.exit_time || "",
   entry: trade.entry_price?.toString?.() ?? "",
@@ -97,6 +109,18 @@ const getSortedTrades = (trades) =>
     const right = `${b.date || ""} ${b.entryTime || "00:00"}`;
     return left.localeCompare(right);
   });
+
+const getInstrumentDetails = (trade) => {
+  if (trade.instrumentType === "Options") {
+    return [trade.optionStrike, trade.optionType].filter(Boolean).join(" ");
+  }
+
+  if (trade.instrumentType === "Futures") {
+    return trade.futuresExpiryMonth ? `Expiry ${trade.futuresExpiryMonth}` : "";
+  }
+
+  return "";
+};
 
 const buildDailyPnl = (trades) => {
   const grouped = trades.reduce((acc, trade) => {
@@ -1222,6 +1246,46 @@ function JournalPage({
 
         <div style={row}>
           <div style={field}>
+            <label style={labelStyle}>Instrument Type *</label>
+            <select name="instrumentType" value={form.instrumentType} onChange={handleChange} style={input}>
+              <option value="Stocks">Stocks</option>
+              <option value="Futures">Futures</option>
+              <option value="Options">Options</option>
+            </select>
+          </div>
+          {form.instrumentType === "Options" && (
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <div style={field}>
+                <label style={labelStyle}>Strike *</label>
+                <input name="optionStrike" value={form.optionStrike} onChange={handleChange} style={input} placeholder="Strike price" />
+              </div>
+              <div style={field}>
+                <label style={labelStyle}>Option Type *</label>
+                <select name="optionType" value={form.optionType} onChange={handleChange} style={input}>
+                  <option value="">Select type</option>
+                  <option value="CE">CE</option>
+                  <option value="PE">PE</option>
+                </select>
+              </div>
+            </div>
+          )}
+          {form.instrumentType === "Futures" && (
+            <div style={field}>
+              <label style={labelStyle}>Futures Expiry Month *</label>
+              <input name="futuresExpiryMonth" value={form.futuresExpiryMonth} onChange={handleChange} style={input} type="month" />
+            </div>
+          )}
+          {form.instrumentType === "Stocks" && (
+            <div style={{ ...field, justifyContent: "center" }}>
+              <div style={{ padding: "14px 16px", border: "1px dashed #bfdbfe", borderRadius: "14px", color: "#64748b", background: "#f8fbff", fontSize: "13px" }}>
+                Stock trades use the standard journal fields.
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div style={row}>
+          <div style={field}>
             <label style={labelStyle}>Entry Time *</label>
             <input name="entryTime" value={form.entryTime} onChange={handleChange} style={input} type="time" />
           </div>
@@ -1489,11 +1553,13 @@ function JournalPage({
           <p style={{ color: "#666", fontSize: "14px" }}>No trades saved yet.</p>
         ) : (
           <div style={tableWrapperStyle}>
-            <table style={{ ...tableStyle, minWidth: "1200px" }}>
+            <table style={{ ...tableStyle, minWidth: "1400px" }}>
               <thead>
                 <tr style={tableHeadRowStyle}>
                   <th style={tableHeadCellStyle}>Date</th>
                   <th style={tableHeadCellStyle}>Instrument</th>
+                  <th style={tableHeadCellStyle}>Type</th>
+                  <th style={tableHeadCellStyle}>Details</th>
                   <th style={tableHeadCellStyle}>Entry Time</th>
                   <th style={tableHeadCellStyle}>Exit Time</th>
                   <th style={tableHeadCellStyle}>Entry</th>
@@ -1514,6 +1580,8 @@ function JournalPage({
                     <td style={tableBodyCellStyle}>
                       <span style={tagStyle}>{trade.instrument}</span>
                     </td>
+                    <td style={tableBodyCellStyle}>{trade.instrumentType || "Stocks"}</td>
+                    <td style={tableBodyCellStyle}>{getInstrumentDetails(trade) || "-"}</td>
                     <td style={tableBodyCellStyle}>{trade.entryTime}</td>
                     <td style={tableBodyCellStyle}>{trade.exitTime}</td>
                     <td style={tableBodyCellStyle}>{trade.entry}</td>
@@ -2011,6 +2079,17 @@ export default function App() {
       return;
     }
 
+    if (name === "instrumentType") {
+      setForm({
+        ...form,
+        instrumentType: value,
+        optionStrike: "",
+        optionType: "",
+        futuresExpiryMonth: ""
+      });
+      return;
+    }
+
     setForm({ ...form, [name]: value });
   };
 
@@ -2061,6 +2140,9 @@ export default function App() {
     if (
       !form.date ||
       !form.instrument.trim() ||
+      !form.instrumentType ||
+      (form.instrumentType === "Options" && (!form.optionStrike || !form.optionType)) ||
+      (form.instrumentType === "Futures" && !form.futuresExpiryMonth) ||
       !form.entryTime ||
       !form.exitTime ||
       !form.entry ||
@@ -2115,6 +2197,10 @@ export default function App() {
     setForm({
       date: trade.date,
       instrument: trade.instrument,
+      instrumentType: trade.instrumentType,
+      optionStrike: trade.optionStrike,
+      optionType: trade.optionType,
+      futuresExpiryMonth: trade.futuresExpiryMonth,
       entryTime: trade.entryTime,
       exitTime: trade.exitTime,
       entry: trade.entry,
@@ -2181,6 +2267,8 @@ export default function App() {
     const headers = [
       "Date",
       "Instrument",
+      "Instrument Type",
+      "Instrument Details",
       "Entry Time",
       "Exit Time",
       "Entry",
@@ -2201,6 +2289,8 @@ export default function App() {
       [
         trade.date,
         trade.instrument,
+        trade.instrumentType,
+        getInstrumentDetails(trade),
         trade.entryTime,
         trade.exitTime,
         trade.entry,
