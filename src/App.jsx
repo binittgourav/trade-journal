@@ -1528,7 +1528,7 @@ function JournalPage({
 
         <div style={row}>
           <div style={field}>
-            <label style={labelStyle}>Rating</label>
+            <label style={labelStyle}>Rating (1-10)</label>
             <input name="rating" value={form.rating} onChange={handleChange} style={input} placeholder="Rate the trade quality" />
           </div>
           <div style={field}>
@@ -1652,7 +1652,7 @@ function JournalPage({
                   <th style={tableHeadCellStyle}>Qty</th>
                   <th style={tableHeadCellStyle}>Strategy</th>
                   <th style={tableHeadCellStyle}>Before</th>
-                  <th style={tableHeadCellStyle}>Rating</th>
+                  <th style={tableHeadCellStyle}>Rating (1-10)</th>
                   <th style={tableHeadCellStyle}>P&amp;L</th>
                   <th style={tableHeadCellStyle}>Actions</th>
                 </tr>
@@ -2391,7 +2391,7 @@ export default function App() {
       "Stop Loss",
       "Target",
       "Planned Trade",
-      "Rating",
+      "Rating (1-10)",
       "P&L"
     ];
 
