@@ -1139,49 +1139,6 @@ function AnalyticsPage({ trades, btn }) {
           </div>
         )}
       </div>
-
-      <div style={tableWrapperStyle}>
-        <table style={{ ...tableStyle, minWidth: "900px" }}>
-          <thead>
-            <tr style={tableHeadRowStyle}>
-              <th style={tableHeadCellStyle}>Date</th>
-              <th style={tableHeadCellStyle}>Instrument</th>
-              <th style={tableHeadCellStyle}>Strategy</th>
-              <th style={tableHeadCellStyle}>Qty</th>
-              <th style={tableHeadCellStyle}>Entry Price</th>
-              <th style={tableHeadCellStyle}>Exit Price</th>
-              <th style={tableHeadCellStyle}>Rating</th>
-              <th style={tableHeadCellStyle}>P&amp;L</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredTrades.length === 0 ? (
-              <tr>
-                <td colSpan="8" style={{ ...mutedCellStyle, padding: "18px 16px" }}>
-                  No trades match the current filters.
-                </td>
-              </tr>
-            ) : (
-              getSortedTrades(filteredTrades).map((trade, index) => (
-                <tr key={trade.id || index} style={getStripedRowStyle(index)}>
-                  <td style={tableBodyCellStyle}>{trade.date}</td>
-                  <td style={tableBodyCellStyle}>
-                    <span style={tagStyle}>{trade.instrument}</span>
-                  </td>
-                  <td style={tableBodyCellStyle}>{trade.strategy}</td>
-                  <td style={tableBodyCellStyle}>{trade.quantity}</td>
-                  <td style={tableBodyCellStyle}>{trade.entry}</td>
-                  <td style={tableBodyCellStyle}>{trade.exit}</td>
-                  <td style={tableBodyCellStyle}>{trade.rating || "-"}</td>
-                  <td style={tableBodyCellStyle}>
-                    <span style={getPnlBadgeStyle(trade.pnl)}>{formatNumber(trade.pnl)}</span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
