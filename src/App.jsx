@@ -1289,7 +1289,7 @@ function JournalPage({
               style={{ ...btn, background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)", color: "white", height: "48px" }}
               onClick={() => setShowEmotionBox(!showEmotionBox)}
             >
-              Manage Emotions
+              Add Emotion
             </button>
           </div>
         </div>
