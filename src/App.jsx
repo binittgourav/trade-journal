@@ -1478,7 +1478,7 @@ function JournalPage({
   );
 }
 
-function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPassword, onSubmit, isSubmitting, errorMessage }) {
+function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPassword, onSubmit, isSubmitting, errorMessage, successMessage }) {
   const card = {
     maxWidth: "460px",
     margin: "80px auto",
@@ -1539,6 +1539,12 @@ function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPasswor
         {errorMessage && (
           <div style={{ marginTop: "16px", padding: "12px 14px", borderRadius: "14px", background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
             {errorMessage}
+          </div>
+        )}
+
+        {successMessage && (
+          <div style={{ marginTop: "16px", padding: "12px 14px", borderRadius: "14px", background: "#ecfdf5", color: "#166534", border: "1px solid #bbf7d0" }}>
+            {successMessage}
           </div>
         )}
 
@@ -1739,6 +1745,7 @@ export default function App() {
   const [isBootstrapping, setIsBootstrapping] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [authMode, setAuthMode] = useState("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -1820,6 +1827,14 @@ export default function App() {
       return;
     }
 
+    const searchParams = new URLSearchParams(window.location.search);
+
+    if (searchParams.get("verified") === "1") {
+      setAuthMode("signin");
+      setSuccessMessage("Email has been verified. You can sign in now.");
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
     let isMounted = true;
 
     supabase.auth.getSession().then(({ data, error }) => {
@@ -1851,6 +1866,7 @@ export default function App() {
       setErrorMessage("");
 
       if (nextSession?.user?.id) {
+        setSuccessMessage("");
         fetchAllUserData(nextSession.user.id);
       }
     });
@@ -1877,11 +1893,18 @@ export default function App() {
 
     setIsSaving(true);
     setErrorMessage("");
+    setSuccessMessage("");
 
     const authAction =
       authMode === "signin"
         ? supabase.auth.signInWithPassword({ email: email.trim(), password })
-        : supabase.auth.signUp({ email: email.trim(), password });
+        : supabase.auth.signUp({
+            email: email.trim(),
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/?verified=1`
+            }
+          });
 
     const { error } = await authAction;
 
@@ -1893,7 +1916,7 @@ export default function App() {
     }
 
     if (authMode === "signup") {
-      setErrorMessage("Account created. Check your email if your Supabase project requires email confirmation.");
+      setSuccessMessage("Account created. Check your email to verify your account.");
     }
   };
 
@@ -2115,6 +2138,7 @@ export default function App() {
         onSubmit={handleAuth}
         isSubmitting={isSaving}
         errorMessage={errorMessage}
+        successMessage={successMessage}
       />
     );
   }
