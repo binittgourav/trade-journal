@@ -15,6 +15,7 @@ const emptyForm = {
   after: "",
   sl: "",
   target: "",
+  plannedTrade: "",
   rating: ""
 };
 
@@ -59,6 +60,7 @@ const toTradeRecord = (form) => ({
   emotion_after: form.after.trim(),
   stop_loss: form.sl ? safeNumber(form.sl) : null,
   target: form.target ? safeNumber(form.target) : null,
+  planned_trade: form.plannedTrade || null,
   rating: form.rating.trim() || null
 });
 
@@ -77,6 +79,7 @@ const fromTradeRecord = (trade) => ({
   after: trade.emotion_after || "",
   sl: trade.stop_loss?.toString?.() ?? "",
   target: trade.target?.toString?.() ?? "",
+  plannedTrade: trade.planned_trade || "",
   rating: trade.rating || "",
   pnl: safeNumber(trade.quantity) * (safeNumber(trade.exit_price) - safeNumber(trade.entry_price))
 });
@@ -1371,6 +1374,14 @@ function JournalPage({
             <label style={labelStyle}>Rating</label>
             <input name="rating" value={form.rating} onChange={handleChange} style={input} placeholder="Rate the trade quality" />
           </div>
+          <div style={field}>
+            <label style={labelStyle}>Is it your planned trade?</label>
+            <select name="plannedTrade" value={form.plannedTrade} onChange={handleChange} style={input}>
+              <option value="">Select answer</option>
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
         </div>
 
         <button
@@ -1993,6 +2004,7 @@ export default function App() {
       after: trade.after,
       sl: trade.sl,
       target: trade.target,
+      plannedTrade: trade.plannedTrade,
       rating: trade.rating
     });
     setEditingTradeId(tradeId);

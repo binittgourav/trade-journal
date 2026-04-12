@@ -16,9 +16,13 @@ create table if not exists public.trades (
   emotion_after text default '',
   stop_loss numeric(12, 2),
   target numeric(12, 2),
+  planned_trade text check (planned_trade in ('Yes', 'No') or planned_trade is null),
   rating text,
   created_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.trades
+add column if not exists planned_trade text check (planned_trade in ('Yes', 'No') or planned_trade is null);
 
 create table if not exists public.strategies (
   id uuid primary key default gen_random_uuid(),
