@@ -1941,13 +1941,37 @@ function AppShell({ page, setPage, userEmail, onSignOut, children }) {
         </nav>
 
         <div style={{ marginTop: "auto", display: "flex", gap: "10px", justifyContent: "space-between" }}>
-          <button type="button" aria-label="Profile" title="Profile" onClick={() => setPage("profile")} style={iconButtonStyle(page === "profile")}>
+          <button
+            type="button"
+            className="sidebar-icon-button"
+            aria-label="Profile"
+            data-tooltip="Profile"
+            title="Profile"
+            onClick={() => setPage("profile")}
+            style={iconButtonStyle(page === "profile")}
+          >
             <Icon name="profile" />
           </button>
-          <button type="button" aria-label="Settings" title="Settings" onClick={() => setPage("settings")} style={iconButtonStyle(page === "settings")}>
+          <button
+            type="button"
+            className="sidebar-icon-button"
+            aria-label="Settings"
+            data-tooltip="Settings"
+            title="Settings"
+            onClick={() => setPage("settings")}
+            style={iconButtonStyle(page === "settings")}
+          >
             <Icon name="settings" />
           </button>
-          <button type="button" aria-label="Sign out" title="Sign out" onClick={onSignOut} style={iconButtonStyle(false, true)}>
+          <button
+            type="button"
+            className="sidebar-icon-button"
+            aria-label="Sign out"
+            data-tooltip="Sign out"
+            title="Sign out"
+            onClick={onSignOut}
+            style={iconButtonStyle(false, true)}
+          >
             <Icon name="signout" />
           </button>
         </div>
