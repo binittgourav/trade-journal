@@ -1235,7 +1235,7 @@ function JournalPage({
           </div>
           <div style={field}>
             <label style={labelStyle}>Strategy *</label>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 48px", gap: "10px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 128px", gap: "10px" }}>
               <select name="strategy" value={form.strategy} onChange={handleChange} style={input}>
                 <option value="">Select strategy</option>
                 {strategies.map((strategy) => (
@@ -1246,10 +1246,10 @@ function JournalPage({
               </select>
               <button
                 type="button"
-                style={{ ...btn, background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)", color: "white", padding: "0" }}
+                style={{ ...btn, background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)", color: "white", padding: "0 12px" }}
                 onClick={() => setShowStrategyBox(!showStrategyBox)}
               >
-                +
+                Add Strategy
               </button>
             </div>
           </div>
