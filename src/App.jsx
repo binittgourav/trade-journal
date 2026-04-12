@@ -1397,6 +1397,9 @@ function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPasswor
     borderRadius: "14px",
     border: "1px solid #dbe4f0",
     background: "#ffffff",
+    color: "#0f172a",
+    WebkitTextFillColor: "#0f172a",
+    colorScheme: "light",
     fontSize: "14px",
     boxSizing: "border-box"
   };
