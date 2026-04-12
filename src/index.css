@@ -55,15 +55,30 @@ body {
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
   margin: 0 auto;
   text-align: center;
-  border-inline: 1px solid var(--border);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .app-sidebar {
+    position: static !important;
+    height: auto !important;
+    padding: 18px !important;
+  }
+
+  .app-main {
+    padding: 0 12px 18px !important;
+  }
 }
 
 h1,

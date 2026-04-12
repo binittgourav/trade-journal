@@ -529,7 +529,7 @@ function CombinedAnalysisTable({ title, columnLabels, rows, emptyMessage }) {
   );
 }
 
-function AnalyticsPage({ trades, btn, onBack }) {
+function AnalyticsPage({ trades, btn }) {
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
@@ -664,9 +664,6 @@ function AnalyticsPage({ trades, btn, onBack }) {
             Track performance, daily consistency, account growth, and emotional patterns.
           </div>
         </div>
-        <button onClick={onBack} style={{ ...btn, background: "#2e86de", color: "white" }}>
-          Go to Trade Journal
-        </button>
       </div>
 
       <div style={filterCard}>
@@ -956,8 +953,6 @@ function JournalPage({
   input,
   field,
   row,
-  onGoToAnalytics,
-  onSignOut,
   isSaving,
   errorMessage
 }) {
@@ -1072,14 +1067,6 @@ function JournalPage({
             <p style={{ margin: "8px 0 0", color: "#475569", fontSize: "15px", maxWidth: "720px", lineHeight: 1.6 }}>
               Capture each trade with structure, context, and emotion so your journal becomes a tool for sharper decisions.
             </p>
-          </div>
-          <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-            <button onClick={onGoToAnalytics} style={{ ...btn, background: "linear-gradient(135deg, #16a34a 0%, #22c55e 100%)", color: "white" }}>
-              Go to Analytics
-            </button>
-            <button onClick={onSignOut} style={{ ...btn, background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}>
-              Sign Out
-            </button>
           </div>
         </div>
       </div>
@@ -1494,6 +1481,143 @@ function SetupRequiredPage() {
   );
 }
 
+function AppShell({ page, setPage, userEmail, onSignOut, children }) {
+  const navItems = [
+    { key: "journal", label: "Journal" },
+    { key: "analytics", label: "Analytics" },
+    { key: "profile", label: "Profile" },
+    { key: "settings", label: "Settings" }
+  ];
+
+  const shellStyle = {
+    minHeight: "100vh",
+    display: "grid",
+    gridTemplateColumns: "240px minmax(0, 1fr)",
+    background: "linear-gradient(135deg, #eaf4ff 0%, #f8fbff 45%, #f7fee7 100%)",
+    fontFamily: "Arial"
+  };
+
+  const sidebarStyle = {
+    position: "sticky",
+    top: 0,
+    height: "100vh",
+    padding: "24px 18px",
+    boxSizing: "border-box",
+    background: "linear-gradient(180deg, #0f172a 0%, #1e3a8a 100%)",
+    color: "#ffffff",
+    display: "flex",
+    flexDirection: "column",
+    gap: "22px"
+  };
+
+  const navButtonStyle = (active) => ({
+    width: "100%",
+    border: active ? "1px solid rgba(255, 255, 255, 0.72)" : "1px solid rgba(255, 255, 255, 0.12)",
+    borderRadius: "14px",
+    padding: "13px 14px",
+    textAlign: "left",
+    cursor: "pointer",
+    color: "#ffffff",
+    background: active ? "rgba(255, 255, 255, 0.18)" : "transparent",
+    fontSize: "14px",
+    fontWeight: "700"
+  });
+
+  return (
+    <div className="app-shell" style={shellStyle}>
+      <aside className="app-sidebar" style={sidebarStyle}>
+        <div>
+          <div style={{ fontSize: "12px", letterSpacing: "0.12em", textTransform: "uppercase", color: "#bfdbfe", fontWeight: "700" }}>
+            Trade Journal
+          </div>
+          <div style={{ marginTop: "10px", fontSize: "20px", fontWeight: "800", lineHeight: 1.2 }}>Performance Desk</div>
+          <div style={{ marginTop: "10px", fontSize: "12px", color: "#cbd5e1", overflowWrap: "anywhere" }}>{userEmail}</div>
+        </div>
+
+        <nav style={{ display: "grid", gap: "10px" }}>
+          {navItems.map((item) => (
+            <button key={item.key} type="button" onClick={() => setPage(item.key)} style={navButtonStyle(page === item.key)}>
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <button
+          type="button"
+          onClick={onSignOut}
+          style={{
+            ...navButtonStyle(false),
+            marginTop: "auto",
+            background: "rgba(248, 113, 113, 0.18)",
+            border: "1px solid rgba(254, 202, 202, 0.45)"
+          }}
+        >
+          Sign Out
+        </button>
+      </aside>
+
+      <main className="app-main" style={{ minWidth: 0, padding: "1px 18px 24px" }}>{children}</main>
+    </div>
+  );
+}
+
+function ProfilePage({ userEmail }) {
+  return (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "20px auto",
+        padding: "28px",
+        borderRadius: "24px",
+        background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+        border: "1px solid #dbe4f0",
+        boxShadow: "0 20px 50px rgba(15, 23, 42, 0.07)",
+        fontFamily: "Arial",
+        textAlign: "left"
+      }}
+    >
+      <div style={{ color: "#2563eb", fontSize: "12px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        Profile
+      </div>
+      <h2 style={{ margin: "10px 0 8px", fontSize: "30px", color: "#0f172a" }}>Your account</h2>
+      <p style={{ color: "#64748b", fontSize: "15px", lineHeight: 1.6 }}>Basic account details for your trade journal.</p>
+
+      <div style={{ marginTop: "22px", display: "grid", gap: "12px" }}>
+        <div style={{ padding: "16px", border: "1px solid #e2e8f0", borderRadius: "16px", background: "#ffffff" }}>
+          <div style={{ fontSize: "12px", color: "#64748b", fontWeight: "700", textTransform: "uppercase" }}>Email</div>
+          <div style={{ marginTop: "6px", color: "#0f172a", fontWeight: "700", overflowWrap: "anywhere" }}>{userEmail}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SettingsPage() {
+  return (
+    <div
+      style={{
+        maxWidth: "900px",
+        margin: "20px auto",
+        padding: "28px",
+        borderRadius: "24px",
+        background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+        border: "1px solid #dbe4f0",
+        boxShadow: "0 20px 50px rgba(15, 23, 42, 0.07)",
+        fontFamily: "Arial",
+        textAlign: "left"
+      }}
+    >
+      <div style={{ color: "#2563eb", fontSize: "12px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        Settings
+      </div>
+      <h2 style={{ margin: "10px 0 8px", fontSize: "30px", color: "#0f172a" }}>Journal settings</h2>
+      <p style={{ color: "#64748b", fontSize: "15px", lineHeight: 1.6 }}>
+        Settings controls can live here later, such as currency, risk preferences, notifications, or default instruments.
+      </p>
+    </div>
+  );
+}
+
 export default function App() {
   const [page, setPage] = useState("journal");
   const [session, setSession] = useState(null);
@@ -1883,11 +2007,7 @@ export default function App() {
     );
   }
 
-  if (page === "analytics") {
-    return <AnalyticsPage trades={trades} btn={btn} onBack={() => setPage("journal")} />;
-  }
-
-  return (
+  let activePage = (
     <JournalPage
       userEmail={session.user.email}
       form={form}
@@ -1916,10 +2036,26 @@ export default function App() {
       input={input}
       field={field}
       row={row}
-      onGoToAnalytics={() => setPage("analytics")}
-      onSignOut={signOut}
       isSaving={isSaving}
       errorMessage={errorMessage}
     />
+  );
+
+  if (page === "analytics") {
+    activePage = <AnalyticsPage trades={trades} btn={btn} />;
+  }
+
+  if (page === "profile") {
+    activePage = <ProfilePage userEmail={session.user.email} />;
+  }
+
+  if (page === "settings") {
+    activePage = <SettingsPage />;
+  }
+
+  return (
+    <AppShell page={page} setPage={setPage} userEmail={session.user.email} onSignOut={signOut}>
+      {activePage}
+    </AppShell>
   );
 }
