@@ -35,8 +35,10 @@ const safeNumber = (value) => {
 const formatNumber = (value) => safeNumber(value).toFixed(2);
 
 const todayDate = new Date().toISOString().slice(0, 10);
-const marketOpenTime = "09:15";
-const marketCloseTime = "15:30";
+const marketOpenTime = "09:00";
+const marketCloseTime = "15:59";
+const marketHours = ["09", "10", "11", "12", "13", "14", "15"];
+const marketMinutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, "0"));
 
 const isWithinMarketHours = (time) => time >= marketOpenTime && time <= marketCloseTime;
 
@@ -380,6 +382,40 @@ const pageSubtitleStyle = {
   maxWidth: "720px",
   lineHeight: 1.7
 };
+
+function TimeSelect({ name, value, onChange, inputStyle }) {
+  const [hour = "", minute = ""] = value ? value.split(":") : [];
+
+  const updateTime = (nextHour, nextMinute) => {
+    onChange({
+      target: {
+        name,
+        value: nextHour && nextMinute ? `${nextHour}:${nextMinute}` : ""
+      }
+    });
+  };
+
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+      <select value={hour} onChange={(event) => updateTime(event.target.value, minute || "00")} style={inputStyle}>
+        <option value="">Hour</option>
+        {marketHours.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+      <select value={minute} onChange={(event) => updateTime(hour || "09", event.target.value)} style={inputStyle}>
+        <option value="">Min</option>
+        {marketMinutes.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 function LineChart({ data, height = 260 }) {
   if (!data.length) {
@@ -1284,11 +1320,11 @@ function JournalPage({
         <div style={row}>
           <div style={field}>
             <label style={labelStyle}>Entry Time *</label>
-            <input name="entryTime" value={form.entryTime} onChange={handleChange} style={input} type="time" min={marketOpenTime} max={marketCloseTime} />
+            <TimeSelect name="entryTime" value={form.entryTime} onChange={handleChange} inputStyle={input} />
           </div>
           <div style={field}>
             <label style={labelStyle}>Exit Time *</label>
-            <input name="exitTime" value={form.exitTime} onChange={handleChange} style={input} type="time" min={marketOpenTime} max={marketCloseTime} />
+            <TimeSelect name="exitTime" value={form.exitTime} onChange={handleChange} inputStyle={input} />
           </div>
         </div>
 
@@ -2105,11 +2141,6 @@ export default function App() {
       return;
     }
 
-    if (!isWithinMarketHours(form.entryTime) || !isWithinMarketHours(form.exitTime)) {
-      setErrorMessage("Entry and exit time must be between 09:15 AM and 03:30 PM.");
-      return;
-    }
-
     setIsSaving(true);
     setErrorMessage("");
     setSuccessMessage("");
@@ -2158,6 +2189,11 @@ export default function App() {
       !form.strategy.trim()
     ) {
       setErrorMessage("Fill all required trade fields.");
+      return;
+    }
+
+    if (!isWithinMarketHours(form.entryTime) || !isWithinMarketHours(form.exitTime)) {
+      setErrorMessage("Entry and exit time must be between 09:00 AM and 03:59 PM.");
       return;
     }
 
