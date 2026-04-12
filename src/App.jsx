@@ -35,6 +35,10 @@ const safeNumber = (value) => {
 const formatNumber = (value) => safeNumber(value).toFixed(2);
 
 const todayDate = new Date().toISOString().slice(0, 10);
+const marketOpenTime = "09:15";
+const marketCloseTime = "15:30";
+
+const isWithinMarketHours = (time) => time >= marketOpenTime && time <= marketCloseTime;
 
 const escapeCsvValue = (value) => {
   const text = value === null || value === undefined ? "" : String(value);
@@ -1280,11 +1284,11 @@ function JournalPage({
         <div style={row}>
           <div style={field}>
             <label style={labelStyle}>Entry Time *</label>
-            <input name="entryTime" value={form.entryTime} onChange={handleChange} style={input} type="time" />
+            <input name="entryTime" value={form.entryTime} onChange={handleChange} style={input} type="time" min={marketOpenTime} max={marketCloseTime} />
           </div>
           <div style={field}>
             <label style={labelStyle}>Exit Time *</label>
-            <input name="exitTime" value={form.exitTime} onChange={handleChange} style={input} type="time" />
+            <input name="exitTime" value={form.exitTime} onChange={handleChange} style={input} type="time" min={marketOpenTime} max={marketCloseTime} />
           </div>
         </div>
 
@@ -2072,6 +2076,11 @@ export default function App() {
       return;
     }
 
+    if ((name === "entryTime" || name === "exitTime") && value && !isWithinMarketHours(value)) {
+      setForm({ ...form, [name]: value < marketOpenTime ? marketOpenTime : marketCloseTime });
+      return;
+    }
+
     if (name === "instrumentType") {
       setForm({
         ...form,
@@ -2093,6 +2102,11 @@ export default function App() {
 
     if (!email.trim() || !password.trim()) {
       setErrorMessage("Enter your email and password.");
+      return;
+    }
+
+    if (!isWithinMarketHours(form.entryTime) || !isWithinMarketHours(form.exitTime)) {
+      setErrorMessage("Entry and exit time must be between 09:15 AM and 03:30 PM.");
       return;
     }
 
