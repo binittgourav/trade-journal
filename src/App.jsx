@@ -298,6 +298,51 @@ const tagStyle = {
   fontWeight: "600"
 };
 
+const pageHeroInnerStyle = {
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  gap: "16px",
+  flexWrap: "wrap",
+  textAlign: "center"
+};
+
+const pageEyebrowStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  padding: "6px 12px",
+  borderRadius: "999px",
+  background: "rgba(37, 99, 235, 0.1)",
+  border: "1px solid rgba(37, 99, 235, 0.18)",
+  color: "#1d4ed8",
+  fontSize: "11px",
+  fontWeight: "800",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  marginBottom: "12px"
+};
+
+const pageTitleStyle = {
+  margin: 0,
+  color: "#0f172a",
+  fontSize: "clamp(32px, 4vw, 48px)",
+  fontWeight: "900",
+  letterSpacing: "-0.05em",
+  lineHeight: 1,
+  background: "linear-gradient(135deg, #0f172a 0%, #1d4ed8 58%, #16a34a 100%)",
+  WebkitBackgroundClip: "text",
+  WebkitTextFillColor: "transparent"
+};
+
+const pageSubtitleStyle = {
+  margin: "12px auto 0",
+  color: "#475569",
+  fontSize: "15px",
+  maxWidth: "720px",
+  lineHeight: 1.7
+};
+
 function LineChart({ data, height = 260 }) {
   if (!data.length) {
     return <div style={{ color: "#6b7280", fontSize: "14px" }}>Add some trades to see the equity curve.</div>;
@@ -651,16 +696,28 @@ function AnalyticsPage({ trades, btn }) {
       style={{
         maxWidth: "1200px",
         margin: "20px auto",
-        background: "linear-gradient(180deg, #f8fbff 0%, #ffffff 100%)",
+        background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
         padding: "24px",
-        borderRadius: "20px",
-        fontFamily: "Arial"
+        borderRadius: "24px",
+        fontFamily: "Arial",
+        border: "1px solid #dbeafe",
+        boxShadow: "0 20px 50px rgba(15, 23, 42, 0.07)"
       }}
     >
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "22px", gap: "16px", flexWrap: "wrap", textAlign: "center" }}>
+      <div
+        style={{
+          ...pageHeroInnerStyle,
+          marginBottom: "22px",
+          padding: "28px 18px",
+          borderRadius: "22px",
+          background: "radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.16) 0%, rgba(255, 255, 255, 0) 58%), linear-gradient(135deg, #eff6ff 0%, #ffffff 54%, #f0fdf4 100%)",
+          border: "1px solid #dbeafe"
+        }}
+      >
         <div>
-          <h2 style={{ margin: 0 }}>Analytics Dashboard</h2>
-          <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
+          <div style={pageEyebrowStyle}>Performance Intelligence</div>
+          <h2 style={pageTitleStyle}>Analytics Dashboard</h2>
+          <div style={pageSubtitleStyle}>
             Track performance, daily consistency, account growth, and emotional patterns.
           </div>
         </div>
@@ -967,10 +1024,10 @@ function JournalPage({
   };
 
   const heroCard = {
-    background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 55%, #f0fdf4 100%)",
+    background: "radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.16) 0%, rgba(255, 255, 255, 0) 58%), linear-gradient(135deg, #eff6ff 0%, #ffffff 55%, #f0fdf4 100%)",
     border: "1px solid #dbeafe",
     borderRadius: "22px",
-    padding: "24px",
+    padding: "32px 24px",
     marginBottom: "22px",
     boxShadow: "0 14px 32px rgba(37, 99, 235, 0.08)"
   };
@@ -1058,10 +1115,11 @@ function JournalPage({
   return (
     <div style={pageShell}>
       <div style={heroCard}>
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "16px", flexWrap: "wrap", textAlign: "center" }}>
+        <div style={pageHeroInnerStyle}>
           <div>
-            <h2 style={{ margin: 0, fontSize: "32px", color: "#0f172a" }}>Trade Journal</h2>
-            <p style={{ margin: "8px 0 0", color: "#475569", fontSize: "15px", maxWidth: "720px", lineHeight: 1.6 }}>
+            <div style={pageEyebrowStyle}>Decision Log</div>
+            <h2 style={pageTitleStyle}>Trade Journal</h2>
+            <p style={pageSubtitleStyle}>
               Capture each trade with structure, context, and emotion so your journal becomes a tool for sharper decisions.
             </p>
           </div>
