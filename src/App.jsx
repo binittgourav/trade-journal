@@ -327,7 +327,7 @@ const pageTitleStyle = {
   margin: 0,
   color: "#0f172a",
   fontSize: "clamp(32px, 4vw, 48px)",
-  fontWeight: "700",
+  fontWeight: "800",
   letterSpacing: "-0.035em",
   lineHeight: 1,
   background: "linear-gradient(135deg, #0f172a 0%, #1d4ed8 58%, #16a34a 100%)",
