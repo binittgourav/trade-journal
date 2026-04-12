@@ -2172,6 +2172,12 @@ export default function App() {
       return;
     }
 
+    const shouldSignOut = window.confirm("Are you sure you want to sign out?");
+
+    if (!shouldSignOut) {
+      return;
+    }
+
     await supabase.auth.signOut();
     setPage("journal");
   };
