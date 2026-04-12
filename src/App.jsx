@@ -892,14 +892,14 @@ function AnalyticsPage({ trades, btn }) {
                   style={toggleButtonStyle(analysisDisplayMode === "combined")}
                   onClick={() => setAnalysisDisplayMode("combined")}
                 >
-                  One Table
+                  One table view
                 </button>
                 <button
                   type="button"
                   style={toggleButtonStyle(analysisDisplayMode === "separate")}
                   onClick={() => setAnalysisDisplayMode("separate")}
                 >
-                  Different Tables
+                  Different table view
                 </button>
               </div>
             </div>
