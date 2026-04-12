@@ -1055,6 +1055,10 @@ function JournalPage({
   isSaving,
   errorMessage
 }) {
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
+  const hasExportDateRange = Boolean(exportStartDate || exportEndDate);
+
   const pageShell = {
     maxWidth: "1200px",
     margin: "20px auto",
@@ -1426,20 +1430,53 @@ function JournalPage({
       <div style={{ marginTop: "24px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "12px", flexWrap: "wrap", marginBottom: "14px" }}>
           <h3 style={{ color: "#0f172a", margin: 0 }}>Saved Trades</h3>
-          <button
-            type="button"
-            onClick={exportTradesCsv}
-            disabled={trades.length === 0}
-            style={{
-              ...btn,
-              background: trades.length === 0 ? "#e2e8f0" : "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)",
-              color: trades.length === 0 ? "#64748b" : "white",
-              boxShadow: trades.length === 0 ? "none" : "0 10px 22px rgba(20, 184, 166, 0.2)",
-              opacity: trades.length === 0 ? 0.65 : 1
-            }}
-          >
-            Export CSV
-          </button>
+          <div style={{ display: "flex", alignItems: "end", gap: "10px", flexWrap: "wrap" }}>
+            <div style={{ display: "grid", gap: "5px", textAlign: "left" }}>
+              <label style={{ ...labelStyle, fontSize: "11px" }}>From</label>
+              <input
+                type="date"
+                value={exportStartDate}
+                onChange={(event) => setExportStartDate(event.target.value)}
+                style={{ ...input, padding: "10px 12px", minWidth: "150px" }}
+              />
+            </div>
+            <div style={{ display: "grid", gap: "5px", textAlign: "left" }}>
+              <label style={{ ...labelStyle, fontSize: "11px" }}>To</label>
+              <input
+                type="date"
+                value={exportEndDate}
+                onChange={(event) => setExportEndDate(event.target.value)}
+                style={{ ...input, padding: "10px 12px", minWidth: "150px" }}
+              />
+            </div>
+            {hasExportDateRange && (
+              <button
+                type="button"
+                onClick={() => {
+                  setExportStartDate("");
+                  setExportEndDate("");
+                }}
+                style={{ ...btn, padding: "11px 14px", background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
+              >
+                Clear
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => exportTradesCsv({ startDate: exportStartDate, endDate: exportEndDate })}
+              disabled={trades.length === 0}
+              style={{
+                ...btn,
+                padding: "11px 16px",
+                background: trades.length === 0 ? "#e2e8f0" : "linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)",
+                color: trades.length === 0 ? "#64748b" : "white",
+                boxShadow: trades.length === 0 ? "none" : "0 10px 22px rgba(20, 184, 166, 0.2)",
+                opacity: trades.length === 0 ? 0.65 : 1
+              }}
+            >
+              Export CSV
+            </button>
+          </div>
         </div>
 
         {trades.length === 0 ? (
@@ -2115,10 +2152,16 @@ export default function App() {
     }
   };
 
-  const exportTradesCsv = () => {
-    const rows = getSortedTrades(trades);
+  const exportTradesCsv = ({ startDate = "", endDate = "" } = {}) => {
+    const rows = getSortedTrades(trades).filter((trade) => {
+      const matchesStartDate = !startDate || (trade.date && trade.date >= startDate);
+      const matchesEndDate = !endDate || (trade.date && trade.date <= endDate);
+
+      return matchesStartDate && matchesEndDate;
+    });
 
     if (!rows.length) {
+      window.alert("No trades found for the selected date range.");
       return;
     }
 
@@ -2170,7 +2213,9 @@ export default function App() {
     const link = document.createElement("a");
 
     link.href = url;
-    link.download = `trade-journal-${new Date().toISOString().slice(0, 10)}.csv`;
+    const rangeLabel = startDate || endDate ? `-${startDate || "start"}-to-${endDate || "end"}` : "";
+
+    link.download = `trade-journal${rangeLabel}-${new Date().toISOString().slice(0, 10)}.csv`;
     link.click();
     URL.revokeObjectURL(url);
   };
