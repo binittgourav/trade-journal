@@ -877,7 +877,7 @@ function AnalyticsPage({ trades, btn }) {
       <div style={{ ...card, marginBottom: "24px", padding: "16px 18px" }}>
         <div style={sectionTitle}>
           <span style={sectionTitleDot} />
-          <span>Over All Summary</span>
+          <span>Overall Summary</span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           {[
