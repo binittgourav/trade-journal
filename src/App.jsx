@@ -657,7 +657,7 @@ function AnalyticsPage({ trades, btn }) {
         fontFamily: "Arial"
       }}
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "22px", gap: "16px", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "22px", gap: "16px", flexWrap: "wrap", textAlign: "center" }}>
         <div>
           <h2 style={{ margin: 0 }}>Analytics Dashboard</h2>
           <div style={{ marginTop: "6px", color: "#64748b", fontSize: "14px" }}>
@@ -1058,11 +1058,8 @@ function JournalPage({
   return (
     <div style={pageShell}>
       <div style={heroCard}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "16px", flexWrap: "wrap", textAlign: "center" }}>
           <div>
-            <div style={{ color: "#2563eb", fontSize: "12px", fontWeight: "700", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "10px" }}>
-              Signed in as {userEmail}
-            </div>
             <h2 style={{ margin: 0, fontSize: "32px", color: "#0f172a" }}>Trade Journal</h2>
             <p style={{ margin: "8px 0 0", color: "#475569", fontSize: "15px", maxWidth: "720px", lineHeight: 1.6 }}>
               Capture each trade with structure, context, and emotion so your journal becomes a tool for sharper decisions.
