@@ -715,7 +715,6 @@ function AnalyticsPage({ trades, btn }) {
         }}
       >
         <div>
-          <div style={pageEyebrowStyle}>Performance Intelligence</div>
           <h2 style={pageTitleStyle}>Analytics Dashboard</h2>
           <div style={pageSubtitleStyle}>
             Track performance, daily consistency, account growth, and emotional patterns.
