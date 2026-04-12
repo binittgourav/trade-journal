@@ -327,8 +327,8 @@ const pageTitleStyle = {
   margin: 0,
   color: "#0f172a",
   fontSize: "clamp(32px, 4vw, 48px)",
-  fontWeight: "900",
-  letterSpacing: "-0.05em",
+  fontWeight: "700",
+  letterSpacing: "-0.035em",
   lineHeight: 1,
   background: "linear-gradient(135deg, #0f172a 0%, #1d4ed8 58%, #16a34a 100%)",
   WebkitBackgroundClip: "text",
@@ -1117,7 +1117,6 @@ function JournalPage({
       <div style={heroCard}>
         <div style={pageHeroInnerStyle}>
           <div>
-            <div style={pageEyebrowStyle}>Decision Log</div>
             <h2 style={pageTitleStyle}>Trade Journal</h2>
             <p style={pageSubtitleStyle}>
               Capture each trade with structure, context, and emotion so your journal becomes a tool for sharper decisions.
