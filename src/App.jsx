@@ -1613,10 +1613,48 @@ function SetupRequiredPage() {
 function AppShell({ page, setPage, userEmail, onSignOut, children }) {
   const navItems = [
     { key: "journal", label: "Journal" },
-    { key: "analytics", label: "Analytics" },
-    { key: "profile", label: "Profile" },
-    { key: "settings", label: "Settings" }
+    { key: "analytics", label: "Analytics" }
   ];
+
+  const Icon = ({ name }) => {
+    const iconProps = {
+      width: "19",
+      height: "19",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      ariaHidden: "true"
+    };
+
+    if (name === "profile") {
+      return (
+        <svg {...iconProps}>
+          <path d="M20 21a8 8 0 0 0-16 0" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      );
+    }
+
+    if (name === "settings") {
+      return (
+        <svg {...iconProps}>
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
+          <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.04.04a2 2 0 1 1-2.83 2.83l-.04-.04A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 1.55V21a2 2 0 1 1-4 0v-.05a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.88.34l-.04.04a2 2 0 1 1-2.83-2.83l.04-.04A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.55-1H3a2 2 0 1 1 0-4h.05A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.88l-.04-.04a2 2 0 1 1 2.83-2.83l.04.04A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-1.55V3a2 2 0 1 1 4 0v.05a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.88-.34l.04-.04a2 2 0 1 1 2.83 2.83l-.04.04A1.7 1.7 0 0 0 19.4 9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 1 1 0 4h-.05A1.7 1.7 0 0 0 19.4 15Z" />
+        </svg>
+      );
+    }
+
+    return (
+      <svg {...iconProps}>
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        <path d="M16 17l5-5-5-5" />
+        <path d="M21 12H9" />
+      </svg>
+    );
+  };
 
   const shellStyle = {
     minHeight: "100vh",
@@ -1652,6 +1690,19 @@ function AppShell({ page, setPage, userEmail, onSignOut, children }) {
     fontWeight: "700"
   });
 
+  const iconButtonStyle = (active, danger = false) => ({
+    width: "48px",
+    height: "48px",
+    borderRadius: "16px",
+    border: active ? "1px solid rgba(255, 255, 255, 0.72)" : "1px solid rgba(255, 255, 255, 0.16)",
+    background: danger ? "rgba(248, 113, 113, 0.18)" : active ? "rgba(255, 255, 255, 0.18)" : "rgba(255, 255, 255, 0.08)",
+    color: "#ffffff",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer"
+  });
+
   return (
     <div className="app-shell" style={shellStyle}>
       <aside className="app-sidebar" style={sidebarStyle}>
@@ -1671,18 +1722,17 @@ function AppShell({ page, setPage, userEmail, onSignOut, children }) {
           ))}
         </nav>
 
-        <button
-          type="button"
-          onClick={onSignOut}
-          style={{
-            ...navButtonStyle(false),
-            marginTop: "auto",
-            background: "rgba(248, 113, 113, 0.18)",
-            border: "1px solid rgba(254, 202, 202, 0.45)"
-          }}
-        >
-          Sign Out
-        </button>
+        <div style={{ marginTop: "auto", display: "flex", gap: "10px", justifyContent: "space-between" }}>
+          <button type="button" aria-label="Profile" title="Profile" onClick={() => setPage("profile")} style={iconButtonStyle(page === "profile")}>
+            <Icon name="profile" />
+          </button>
+          <button type="button" aria-label="Settings" title="Settings" onClick={() => setPage("settings")} style={iconButtonStyle(page === "settings")}>
+            <Icon name="settings" />
+          </button>
+          <button type="button" aria-label="Sign out" title="Sign out" onClick={onSignOut} style={iconButtonStyle(false, true)}>
+            <Icon name="signout" />
+          </button>
+        </div>
       </aside>
 
       <main className="app-main" style={{ minWidth: 0, padding: "1px 18px 24px" }}>{children}</main>
