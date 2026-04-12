@@ -822,7 +822,10 @@ function AnalyticsPage({ trades, btn }) {
       </div>
 
       <div style={{ ...card, marginBottom: "24px", padding: "16px 18px" }}>
-        <div style={filterLabel}>Extra Sections</div>
+        <div style={sectionTitle}>
+          <span style={sectionTitleDot} />
+          <span>Extra Sections</span>
+        </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           {[
             { key: "dailyPnl", label: "Daily P&L" },
@@ -882,7 +885,10 @@ function AnalyticsPage({ trades, btn }) {
         <div style={{ ...card, marginBottom: "16px", padding: "16px 18px" }}>
           <div style={{ display: "grid", gap: "14px" }}>
             <div>
-              <div style={filterLabel}>Display Mode</div>
+              <div style={sectionTitle}>
+                <span style={sectionTitleDot} />
+                <span>Display Mode</span>
+              </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                 <button
                   type="button"
@@ -902,7 +908,10 @@ function AnalyticsPage({ trades, btn }) {
             </div>
 
             <div>
-              <div style={filterLabel}>Analysis Types</div>
+              <div style={sectionTitle}>
+                <span style={sectionTitleDot} />
+                <span>Analysis Types</span>
+              </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
                 {[
                   { key: "weekday", label: "Weekday Wise" },
