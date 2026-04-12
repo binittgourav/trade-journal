@@ -633,6 +633,23 @@ function AnalyticsPage({ trades, btn }) {
 
   const dailyPnl = buildDailyPnl(filteredTrades);
   const equityCurve = buildEquityCurve(filteredTrades);
+  const netPnl = filteredTrades.reduce((total, trade) => total + safeNumber(trade.pnl), 0);
+  const winningTrades = filteredTrades.filter((trade) => safeNumber(trade.pnl) > 0).length;
+  const losingTrades = filteredTrades.filter((trade) => safeNumber(trade.pnl) < 0).length;
+  const plannedTrades = filteredTrades.filter((trade) => trade.plannedTrade === "Yes").length;
+  const averagePnl = filteredTrades.length ? netPnl / filteredTrades.length : 0;
+  const bestTrade = filteredTrades.length ? Math.max(...filteredTrades.map((trade) => safeNumber(trade.pnl))) : 0;
+  const worstTrade = filteredTrades.length ? Math.min(...filteredTrades.map((trade) => safeNumber(trade.pnl))) : 0;
+  const winRate = filteredTrades.length ? (winningTrades / filteredTrades.length) * 100 : 0;
+  const plannedRate = filteredTrades.length ? (plannedTrades / filteredTrades.length) * 100 : 0;
+  const riskWarning =
+    losingTrades > winningTrades
+      ? "Losing trades are higher than winning trades in this filtered set. Review entries and risk sizing."
+      : "Risk profile looks stable for this filtered set. Keep tracking consistency.";
+  const performanceTrend =
+    equityCurve.length > 1 && equityCurve[equityCurve.length - 1].value > equityCurve[0].value
+      ? "Cumulative P&L is trending higher across the selected trades."
+      : "Cumulative P&L is flat or under pressure across the selected trades.";
   const hasActiveFilters = Object.values(filters).some(Boolean);
   const analysisLabelMap = {
     weekday: "Weekday",
@@ -864,6 +881,7 @@ function AnalyticsPage({ trades, btn }) {
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           {[
+            { key: "testingSummary", label: "Testing Summary" },
             { key: "dailyPnl", label: "Daily P&L" },
             { key: "equityCurve", label: "Equity Curve" }
           ].map((option) => {
@@ -886,6 +904,57 @@ function AnalyticsPage({ trades, btn }) {
           })}
         </div>
       </div>
+
+      {expandedSections.includes("testingSummary") && (
+        <div style={{ ...card, marginBottom: "24px" }}>
+          <div style={sectionTitle}>
+            <span style={sectionTitleDot} />
+            <span>Testing Summary</span>
+          </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1.15fr) minmax(280px, 0.85fr)",
+              gap: "18px"
+            }}
+          >
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+                gap: "12px"
+              }}
+            >
+              {[
+                { label: "Net P&L", value: formatNumber(netPnl) },
+                { label: "Total Trades", value: filteredTrades.length },
+                { label: "Win Rate", value: `${formatNumber(winRate)}%` },
+                { label: "Average P&L", value: formatNumber(averagePnl) },
+                { label: "Best Trade", value: formatNumber(bestTrade) },
+                { label: "Worst Trade", value: formatNumber(worstTrade) },
+                { label: "Planned Trade %", value: `${formatNumber(plannedRate)}%` },
+                { label: "Losing Trades", value: losingTrades }
+              ].map((item) => (
+                <div key={item.label} style={{ padding: "16px", border: "1px solid #e2e8f0", borderRadius: "16px", background: "#ffffff" }}>
+                  <div style={{ color: "#64748b", fontSize: "11px", fontWeight: "800", letterSpacing: "0.08em", textTransform: "uppercase" }}>{item.label}</div>
+                  <div style={{ marginTop: "8px", color: "#0f172a", fontSize: "20px", fontWeight: "800" }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+
+            <div style={{ display: "grid", gap: "12px" }}>
+              <div style={{ padding: "18px", border: "1px solid #e2e8f0", borderRadius: "16px", background: "#ffffff" }}>
+                <div style={{ color: "#0f172a", fontSize: "14px", fontWeight: "800", marginBottom: "8px" }}>Risk Warning</div>
+                <div style={{ color: "#64748b", fontSize: "14px", lineHeight: 1.6 }}>{riskWarning}</div>
+              </div>
+              <div style={{ padding: "18px", border: "1px solid #e2e8f0", borderRadius: "16px", background: "#ffffff" }}>
+                <div style={{ color: "#0f172a", fontSize: "14px", fontWeight: "800", marginBottom: "8px" }}>Performance Trend</div>
+                <div style={{ color: "#64748b", fontSize: "14px", lineHeight: 1.6 }}>{performanceTrend}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {expandedSections.includes("dailyPnl") && (
         <div style={{ ...card, marginBottom: "24px" }}>
