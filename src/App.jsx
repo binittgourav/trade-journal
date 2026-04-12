@@ -890,11 +890,58 @@ function AnalyticsPage({ trades, btn }) {
       </div>
 
       <div style={{ ...card, marginBottom: "24px", padding: "16px 18px" }}>
-        <div style={sectionTitle}>
-          <span style={sectionTitleDot} />
-          <span>Overall Summary</span>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "end",
+            gap: "14px",
+            flexWrap: "wrap"
+          }}
+        >
+          <div style={{ ...sectionTitle, marginBottom: "10px" }}>
+            <span style={sectionTitleDot} />
+            <span>Overall Summary</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "end", gap: "12px", flexWrap: "wrap" }}>
+            <div style={{ minWidth: "170px" }}>
+              <div style={filterLabel}>Month</div>
+              <input
+                type="month"
+                value={summaryFilters.month}
+                max={todayDate.slice(0, 7)}
+                onChange={(e) => setSummaryFilters({ ...summaryFilters, month: e.target.value })}
+                style={filterInput}
+              />
+            </div>
+            <div style={{ minWidth: "170px" }}>
+              <div style={filterLabel}>Instrument Type</div>
+              <select
+                value={summaryFilters.instrumentType}
+                onChange={(e) => setSummaryFilters({ ...summaryFilters, instrumentType: e.target.value })}
+                style={filterInput}
+              >
+                <option value="">All Types</option>
+                <option value="Stocks">Stocks</option>
+                <option value="Futures">Futures</option>
+                <option value="Options">Options</option>
+              </select>
+            </div>
+            {hasActiveSummaryFilters && (
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setSummaryFilters({ month: "", instrumentType: "" })}
+                  style={{ ...btn, background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
+                >
+                  Clear Summary Filters
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "14px" }}>
           {[
             { key: "testingSummary", label: "Testing Summary" },
             { key: "dailyPnl", label: "Daily P&L" },
@@ -917,52 +964,6 @@ function AnalyticsPage({ trades, btn }) {
               </button>
             );
           })}
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-            gap: "14px",
-            marginTop: "16px",
-            paddingTop: "16px",
-            borderTop: "1px solid #e2e8f0"
-          }}
-        >
-          <div>
-            <div style={filterLabel}>Month</div>
-            <input
-              type="month"
-              value={summaryFilters.month}
-              max={todayDate.slice(0, 7)}
-              onChange={(e) => setSummaryFilters({ ...summaryFilters, month: e.target.value })}
-              style={filterInput}
-            />
-          </div>
-          <div>
-            <div style={filterLabel}>Instrument Type</div>
-            <select
-              value={summaryFilters.instrumentType}
-              onChange={(e) => setSummaryFilters({ ...summaryFilters, instrumentType: e.target.value })}
-              style={filterInput}
-            >
-              <option value="">All Types</option>
-              <option value="Stocks">Stocks</option>
-              <option value="Futures">Futures</option>
-              <option value="Options">Options</option>
-            </select>
-          </div>
-          {hasActiveSummaryFilters && (
-            <div style={{ display: "flex", alignItems: "end" }}>
-              <button
-                type="button"
-                onClick={() => setSummaryFilters({ month: "", instrumentType: "" })}
-                style={{ ...btn, width: "100%", background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
-              >
-                Clear Summary Filters
-              </button>
-            </div>
-          )}
         </div>
 
         <div style={{ marginTop: "12px", color: "#64748b", fontSize: "13px" }}>
