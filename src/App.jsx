@@ -1275,13 +1275,6 @@ function JournalPage({
               <input name="futuresExpiryMonth" value={form.futuresExpiryMonth} onChange={handleChange} style={input} type="month" />
             </div>
           )}
-          {form.instrumentType === "Stocks" && (
-            <div style={{ ...field, justifyContent: "center" }}>
-              <div style={{ padding: "14px 16px", border: "1px dashed #bfdbfe", borderRadius: "14px", color: "#64748b", background: "#f8fbff", fontSize: "13px" }}>
-                Stock trades use the standard journal fields.
-              </div>
-            </div>
-          )}
         </div>
 
         <div style={row}>
