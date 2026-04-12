@@ -943,7 +943,7 @@ function AnalyticsPage({ trades, btn }) {
 
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginTop: "14px" }}>
           {[
-            { key: "testingSummary", label: "Testing Summary" },
+            { key: "testingSummary", label: "Summary" },
             { key: "dailyPnl", label: "Daily P&L" },
             { key: "equityCurve", label: "Equity Curve" }
           ].map((option) => {
@@ -975,7 +975,7 @@ function AnalyticsPage({ trades, btn }) {
         <div style={{ ...card, marginBottom: "24px" }}>
           <div style={sectionTitle}>
             <span style={sectionTitleDot} />
-            <span>Testing Summary</span>
+            <span>Summary</span>
           </div>
           <div
             style={{
