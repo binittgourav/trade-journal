@@ -651,9 +651,28 @@ function AnalyticsPage({ trades, btn }) {
   };
 
   const sectionTitle = {
-    fontSize: "18px",
-    fontWeight: "bold",
-    marginBottom: "8px"
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "12px 14px",
+    borderRadius: "16px",
+    background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
+    border: "1px solid #dbeafe",
+    boxShadow: "0 8px 18px rgba(37, 99, 235, 0.06)",
+    fontSize: "13px",
+    fontWeight: "900",
+    color: "#1d4ed8",
+    textTransform: "uppercase",
+    letterSpacing: "0.09em",
+    marginBottom: "14px"
+  };
+
+  const sectionTitleDot = {
+    width: "9px",
+    height: "9px",
+    borderRadius: "999px",
+    background: "linear-gradient(135deg, #2563eb 0%, #22c55e 100%)",
+    boxShadow: "0 0 0 5px rgba(37, 99, 235, 0.1)"
   };
 
   const filterCard = {
@@ -831,7 +850,10 @@ function AnalyticsPage({ trades, btn }) {
 
       {expandedSections.includes("dailyPnl") && (
         <div style={{ ...card, marginBottom: "24px" }}>
-          <div style={sectionTitle}>Daily P&amp;L</div>
+          <div style={sectionTitle}>
+            <span style={sectionTitleDot} />
+            <span>Daily P&amp;L</span>
+          </div>
           <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
             Each bar shows total profit or loss for that date.
           </div>
@@ -841,7 +863,10 @@ function AnalyticsPage({ trades, btn }) {
 
       {expandedSections.includes("equityCurve") && (
         <div style={{ ...card, marginBottom: "24px" }}>
-          <div style={sectionTitle}>Equity Curve</div>
+          <div style={sectionTitle}>
+            <span style={sectionTitleDot} />
+            <span>Equity Curve</span>
+          </div>
           <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
             This line shows how your cumulative P&amp;L changes trade by trade.
           </div>
@@ -850,7 +875,10 @@ function AnalyticsPage({ trades, btn }) {
       )}
 
       <div style={{ marginBottom: "24px" }}>
-        <div style={{ ...sectionTitle, marginBottom: "14px" }}>P&amp;L Analysis</div>
+        <div style={sectionTitle}>
+          <span style={sectionTitleDot} />
+          <span>P&amp;L Analysis</span>
+        </div>
         <div style={{ ...card, marginBottom: "16px", padding: "16px 18px" }}>
           <div style={{ display: "grid", gap: "14px" }}>
             <div>
