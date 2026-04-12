@@ -618,6 +618,10 @@ function AnalyticsPage({ trades, btn }) {
   const [analysisTypes, setAnalysisTypes] = useState(["weekday"]);
   const [analysisDisplayMode, setAnalysisDisplayMode] = useState("combined");
   const [expandedSections, setExpandedSections] = useState([]);
+  const [summaryFilters, setSummaryFilters] = useState({
+    month: "",
+    instrumentType: ""
+  });
 
   const instruments = [...new Set(trades.map((trade) => (trade.instrument || "").trim()).filter(Boolean))].sort();
   const strategies = [...new Set(trades.map((trade) => (trade.strategy || "").trim()).filter(Boolean))].sort();
@@ -631,26 +635,37 @@ function AnalyticsPage({ trades, btn }) {
     return matchesStartDate && matchesEndDate && matchesInstrument && matchesStrategy;
   });
 
-  const dailyPnl = buildDailyPnl(filteredTrades);
-  const equityCurve = buildEquityCurve(filteredTrades);
-  const netPnl = filteredTrades.reduce((total, trade) => total + safeNumber(trade.pnl), 0);
-  const winningTrades = filteredTrades.filter((trade) => safeNumber(trade.pnl) > 0).length;
-  const losingTrades = filteredTrades.filter((trade) => safeNumber(trade.pnl) < 0).length;
-  const plannedTrades = filteredTrades.filter((trade) => trade.plannedTrade === "Yes").length;
-  const averagePnl = filteredTrades.length ? netPnl / filteredTrades.length : 0;
-  const bestTrade = filteredTrades.length ? Math.max(...filteredTrades.map((trade) => safeNumber(trade.pnl))) : 0;
-  const worstTrade = filteredTrades.length ? Math.min(...filteredTrades.map((trade) => safeNumber(trade.pnl))) : 0;
-  const winRate = filteredTrades.length ? (winningTrades / filteredTrades.length) * 100 : 0;
-  const plannedRate = filteredTrades.length ? (plannedTrades / filteredTrades.length) * 100 : 0;
+  const summaryTrades = filteredTrades.filter((trade) => {
+    const matchesMonth = !summaryFilters.month || (trade.date && trade.date.startsWith(summaryFilters.month));
+    const matchesInstrumentType = !summaryFilters.instrumentType || (trade.instrumentType || "Stocks") === summaryFilters.instrumentType;
+
+    return matchesMonth && matchesInstrumentType;
+  });
+  const summaryDailyPnl = buildDailyPnl(summaryTrades);
+  const summaryEquityCurve = buildEquityCurve(summaryTrades);
+  const netPnl = summaryTrades.reduce((total, trade) => total + safeNumber(trade.pnl), 0);
+  const winningTrades = summaryTrades.filter((trade) => safeNumber(trade.pnl) > 0).length;
+  const losingTrades = summaryTrades.filter((trade) => safeNumber(trade.pnl) < 0).length;
+  const plannedTrades = summaryTrades.filter((trade) => trade.plannedTrade === "Yes").length;
+  const averagePnl = summaryTrades.length ? netPnl / summaryTrades.length : 0;
+  const bestTrade = summaryTrades.length ? Math.max(...summaryTrades.map((trade) => safeNumber(trade.pnl))) : 0;
+  const worstTrade = summaryTrades.length ? Math.min(...summaryTrades.map((trade) => safeNumber(trade.pnl))) : 0;
+  const winRate = summaryTrades.length ? (winningTrades / summaryTrades.length) * 100 : 0;
+  const plannedRate = summaryTrades.length ? (plannedTrades / summaryTrades.length) * 100 : 0;
   const riskWarning =
-    losingTrades > winningTrades
+    summaryTrades.length === 0
+      ? "No trades match the Overall Summary filters yet."
+      : losingTrades > winningTrades
       ? "Losing trades are higher than winning trades in this filtered set. Review entries and risk sizing."
       : "Risk profile looks stable for this filtered set. Keep tracking consistency.";
   const performanceTrend =
-    equityCurve.length > 1 && equityCurve[equityCurve.length - 1].value > equityCurve[0].value
+    summaryEquityCurve.length === 0
+      ? "Add or adjust filters to review the trend."
+      : summaryEquityCurve.length > 1 && summaryEquityCurve[summaryEquityCurve.length - 1].value > summaryEquityCurve[0].value
       ? "Cumulative P&L is trending higher across the selected trades."
       : "Cumulative P&L is flat or under pressure across the selected trades.";
   const hasActiveFilters = Object.values(filters).some(Boolean);
+  const hasActiveSummaryFilters = Object.values(summaryFilters).some(Boolean);
   const analysisLabelMap = {
     weekday: "Weekday",
     emotion: "Emotion",
@@ -903,6 +918,56 @@ function AnalyticsPage({ trades, btn }) {
             );
           })}
         </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "14px",
+            marginTop: "16px",
+            paddingTop: "16px",
+            borderTop: "1px solid #e2e8f0"
+          }}
+        >
+          <div>
+            <div style={filterLabel}>Month</div>
+            <input
+              type="month"
+              value={summaryFilters.month}
+              max={todayDate.slice(0, 7)}
+              onChange={(e) => setSummaryFilters({ ...summaryFilters, month: e.target.value })}
+              style={filterInput}
+            />
+          </div>
+          <div>
+            <div style={filterLabel}>Instrument Type</div>
+            <select
+              value={summaryFilters.instrumentType}
+              onChange={(e) => setSummaryFilters({ ...summaryFilters, instrumentType: e.target.value })}
+              style={filterInput}
+            >
+              <option value="">All Types</option>
+              <option value="Stocks">Stocks</option>
+              <option value="Futures">Futures</option>
+              <option value="Options">Options</option>
+            </select>
+          </div>
+          {hasActiveSummaryFilters && (
+            <div style={{ display: "flex", alignItems: "end" }}>
+              <button
+                type="button"
+                onClick={() => setSummaryFilters({ month: "", instrumentType: "" })}
+                style={{ ...btn, width: "100%", background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
+              >
+                Clear Summary Filters
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginTop: "12px", color: "#64748b", fontSize: "13px" }}>
+          Showing <strong style={{ color: "#0f172a" }}>{summaryTrades.length}</strong> trades in Overall Summary
+        </div>
       </div>
 
       {expandedSections.includes("testingSummary") && (
@@ -927,7 +992,7 @@ function AnalyticsPage({ trades, btn }) {
             >
               {[
                 { label: "Net P&L", value: formatNumber(netPnl) },
-                { label: "Total Trades", value: filteredTrades.length },
+                { label: "Total Trades", value: summaryTrades.length },
                 { label: "Win Rate", value: `${formatNumber(winRate)}%` },
                 { label: "Average P&L", value: formatNumber(averagePnl) },
                 { label: "Best Trade", value: formatNumber(bestTrade) },
@@ -965,7 +1030,7 @@ function AnalyticsPage({ trades, btn }) {
           <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
             Each bar shows total profit or loss for that date.
           </div>
-          <BarChart data={dailyPnl} />
+          <BarChart data={summaryDailyPnl} />
         </div>
       )}
 
@@ -978,7 +1043,7 @@ function AnalyticsPage({ trades, btn }) {
           <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
             This line shows how your cumulative P&amp;L changes trade by trade.
           </div>
-          <LineChart data={equityCurve} />
+          <LineChart data={summaryEquityCurve} />
         </div>
       )}
 
