@@ -1215,12 +1215,6 @@ function JournalPage({
         </div>
       </div>
 
-      {errorMessage && (
-        <div style={{ marginBottom: "18px", padding: "14px 16px", borderRadius: "16px", background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
-          {errorMessage}
-        </div>
-      )}
-
       <div style={formCard}>
         <div style={sectionTitle}>
           <span style={sectionTitleDot} />
@@ -1454,6 +1448,12 @@ function JournalPage({
             </select>
           </div>
         </div>
+
+        {errorMessage && (
+          <div style={{ marginTop: "18px", padding: "14px 16px", borderRadius: "16px", background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
+            {errorMessage}
+          </div>
+        )}
 
         <button
           onClick={saveTrade}
@@ -2066,6 +2066,7 @@ export default function App() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    setErrorMessage("");
 
     if (name === "date" && value > todayDate) {
       setForm({ ...form, [name]: todayDate });
