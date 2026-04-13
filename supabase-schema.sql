@@ -9,6 +9,7 @@ create table if not exists public.trades (
   option_strike numeric(12, 2),
   option_type text check (option_type in ('CE', 'PE') or option_type is null),
   futures_expiry_month text,
+  position text not null default 'Buy' check (position in ('Buy', 'Sell')),
   entry_time time not null,
   exit_time time not null,
   entry_price numeric(12, 2) not null,
@@ -39,6 +40,9 @@ add column if not exists option_type text check (option_type in ('CE', 'PE') or 
 
 alter table public.trades
 add column if not exists futures_expiry_month text;
+
+alter table public.trades
+add column if not exists position text not null default 'Buy' check (position in ('Buy', 'Sell'));
 
 create table if not exists public.strategies (
   id uuid primary key default gen_random_uuid(),

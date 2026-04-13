@@ -10,6 +10,7 @@ const emptyForm = {
   futuresExpiryMonth: "",
   entryTime: "",
   exitTime: "",
+  position: "Buy",
   entry: "",
   exit: "",
   quantity: "",
@@ -35,6 +36,14 @@ const safeNumber = (value) => {
 const formatNumber = (value) => safeNumber(value).toFixed(2);
 
 const todayDate = new Date().toISOString().slice(0, 10);
+
+const calculatePnl = (trade) => {
+  const quantity = safeNumber(trade.quantity);
+  const entry = safeNumber(trade.entry ?? trade.entry_price);
+  const exit = safeNumber(trade.exit ?? trade.exit_price);
+
+  return (trade.position || "Buy") === "Sell" ? quantity * (entry - exit) : quantity * (exit - entry);
+};
 
 const escapeCsvValue = (value) => {
   const text = value === null || value === undefined ? "" : String(value);
@@ -66,6 +75,7 @@ const toTradeRecord = (form) => ({
   futures_expiry_month: form.instrumentType === "Futures" ? form.futuresExpiryMonth || null : null,
   entry_time: form.entryTime,
   exit_time: form.exitTime,
+  position: form.position || "Buy",
   entry_price: safeNumber(form.entry),
   exit_price: safeNumber(form.exit),
   quantity: safeNumber(form.quantity),
@@ -89,6 +99,7 @@ const fromTradeRecord = (trade) => ({
   futuresExpiryMonth: trade.futures_expiry_month || "",
   entryTime: trade.entry_time || "",
   exitTime: trade.exit_time || "",
+  position: trade.position || "Buy",
   entry: trade.entry_price?.toString?.() ?? "",
   exit: trade.exit_price?.toString?.() ?? "",
   quantity: trade.quantity?.toString?.() ?? "",
@@ -100,7 +111,7 @@ const fromTradeRecord = (trade) => ({
   target: trade.target?.toString?.() ?? "",
   plannedTrade: trade.planned_trade || "",
   rating: trade.rating || "",
-  pnl: safeNumber(trade.quantity) * (safeNumber(trade.exit_price) - safeNumber(trade.entry_price))
+  pnl: calculatePnl(trade)
 });
 
 const getSortedTrades = (trades) =>
@@ -1391,6 +1402,16 @@ function JournalPage({
             <input name="quantity" value={form.quantity} onChange={handleChange} style={input} placeholder="Number of units" />
           </div>
           <div style={field}>
+            <label style={labelStyle}>Position *</label>
+            <select name="position" value={form.position} onChange={handleChange} style={input}>
+              <option value="Buy">Buy</option>
+              <option value="Sell">Sell</option>
+            </select>
+          </div>
+        </div>
+
+        <div style={row}>
+          <div style={{ ...field, gridColumn: "1 / -1" }}>
             <label style={labelStyle}>Strategy *</label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 128px", gap: "10px" }}>
               <select name="strategy" value={form.strategy} onChange={handleChange} style={input}>
@@ -1638,7 +1659,7 @@ function JournalPage({
           <p style={{ color: "#666", fontSize: "14px" }}>No trades saved yet.</p>
         ) : (
           <div style={tableWrapperStyle}>
-            <table style={{ ...tableStyle, minWidth: "1400px" }}>
+            <table style={{ ...tableStyle, minWidth: "1500px" }}>
               <thead>
                 <tr style={tableHeadRowStyle}>
                   <th style={tableHeadCellStyle}>Date</th>
@@ -1650,6 +1671,7 @@ function JournalPage({
                   <th style={tableHeadCellStyle}>Entry</th>
                   <th style={tableHeadCellStyle}>Exit</th>
                   <th style={tableHeadCellStyle}>Qty</th>
+                  <th style={tableHeadCellStyle}>Position</th>
                   <th style={tableHeadCellStyle}>Strategy</th>
                   <th style={tableHeadCellStyle}>Before</th>
                   <th style={tableHeadCellStyle}>Rating (1-10)</th>
@@ -1672,6 +1694,7 @@ function JournalPage({
                     <td style={tableBodyCellStyle}>{trade.entry}</td>
                     <td style={tableBodyCellStyle}>{trade.exit}</td>
                     <td style={tableBodyCellStyle}>{trade.quantity}</td>
+                    <td style={tableBodyCellStyle}>{trade.position || "Buy"}</td>
                     <td style={tableBodyCellStyle}>{trade.strategy}</td>
                     <td style={tableBodyCellStyle}>{trade.before || "-"}</td>
                     <td style={tableBodyCellStyle}>{trade.rating || "-"}</td>
@@ -2258,6 +2281,7 @@ export default function App() {
       !form.entry ||
       !form.exit ||
       !form.quantity ||
+      !form.position ||
       !form.strategy.trim()
     ) {
       setErrorMessage("Fill all required trade fields.");
@@ -2316,6 +2340,7 @@ export default function App() {
       entry: trade.entry,
       exit: trade.exit,
       quantity: trade.quantity,
+      position: trade.position || "Buy",
       strategy: trade.strategy,
       before: trade.before,
       during: trade.during,
@@ -2384,6 +2409,7 @@ export default function App() {
       "Entry",
       "Exit",
       "Quantity",
+      "Position",
       "Strategy",
       "Emotion Before",
       "Emotion During",
@@ -2406,6 +2432,7 @@ export default function App() {
         trade.entry,
         trade.exit,
         trade.quantity,
+        trade.position || "Buy",
         trade.strategy,
         trade.before,
         trade.during,
