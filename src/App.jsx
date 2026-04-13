@@ -680,7 +680,7 @@ function AnalyticsPage({ trades, btn }) {
   const analysisLabelMap = {
     weekday: "Weekday",
     emotion: "Emotion",
-    strategy: "Strategy"
+    strategy: "Strategy Used"
   };
   const combinedAnalysisRows = buildCombinedAnalysisRows(filteredTrades, analysisTypes);
   const combinedAnalysisTitle = `${analysisTypes.map((type) => analysisLabelMap[type]).join(" + ")} P&L`;
@@ -712,10 +712,10 @@ function AnalyticsPage({ trades, btn }) {
 
     return {
       key: type,
-      title: "Strategy Wise P&L",
-      nameLabel: "Strategy",
-      rows: buildGroupedPnlStats(filteredTrades, "strategy", "No Strategy"),
-      emptyMessage: "No strategy data yet."
+      title: "Strategy Used P&L",
+      nameLabel: "Strategy Used",
+      rows: buildGroupedPnlStats(filteredTrades, "strategy", "No Strategy Used"),
+      emptyMessage: "No strategy used data yet."
     };
   });
 
@@ -879,7 +879,7 @@ function AnalyticsPage({ trades, btn }) {
             </select>
           </div>
           <div>
-            <div style={filterLabel}>Strategy</div>
+            <div style={filterLabel}>Strategy Used</div>
             <select
               value={filters.strategy}
               onChange={(e) => setFilters({ ...filters, strategy: e.target.value })}
@@ -1095,7 +1095,7 @@ function AnalyticsPage({ trades, btn }) {
                 {[
                   { key: "weekday", label: "Weekday Wise" },
                   { key: "emotion", label: "Emotion Wise" },
-                  { key: "strategy", label: "Strategy Wise" }
+                  { key: "strategy", label: "Strategy Used" }
                 ].map((option) => {
                   const isActive = analysisTypes.includes(option.key);
 
@@ -1412,10 +1412,10 @@ function JournalPage({
 
         <div style={row}>
           <div style={{ ...field, gridColumn: "1 / -1" }}>
-            <label style={labelStyle}>Strategy *</label>
+            <label style={labelStyle}>Strategy Used *</label>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 128px", gap: "10px" }}>
               <select name="strategy" value={form.strategy} onChange={handleChange} style={input}>
-                <option value="">Select strategy</option>
+                <option value="">Select strategy used</option>
                 {strategies.map((strategy) => (
                   <option key={strategy.id} value={strategy.name}>
                     {strategy.name}
@@ -1672,7 +1672,7 @@ function JournalPage({
                   <th style={tableHeadCellStyle}>Exit</th>
                   <th style={tableHeadCellStyle}>Qty</th>
                   <th style={tableHeadCellStyle}>Position</th>
-                  <th style={tableHeadCellStyle}>Strategy</th>
+                  <th style={tableHeadCellStyle}>Strategy Used</th>
                   <th style={tableHeadCellStyle}>Before</th>
                   <th style={tableHeadCellStyle}>Rating (1-10)</th>
                   <th style={tableHeadCellStyle}>P&amp;L</th>
@@ -2410,7 +2410,7 @@ export default function App() {
       "Exit",
       "Quantity",
       "Position",
-      "Strategy",
+      "Strategy Used",
       "Emotion Before",
       "Emotion During",
       "Emotion After",
