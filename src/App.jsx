@@ -2366,6 +2366,7 @@ export default function App() {
       setTrades((current) => [...current, normalizedTrade]);
     }
 
+    await fetchAllUserData(session.user.id);
     setForm(emptyForm);
   };
 
