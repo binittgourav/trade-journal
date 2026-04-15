@@ -1188,7 +1188,18 @@ function JournalPage({
 }) {
   const [exportStartDate, setExportStartDate] = useState("");
   const [exportEndDate, setExportEndDate] = useState("");
+  const [expandedFormSections, setExpandedFormSections] = useState({
+    mindset: false,
+    risk: false
+  });
   const hasExportDateRange = Boolean(exportStartDate || exportEndDate);
+
+  const toggleFormSection = (section) => {
+    setExpandedFormSections((current) => ({
+      ...current,
+      [section]: !current[section]
+    }));
+  };
 
   const pageShell = {
     maxWidth: "1200px",
@@ -1240,6 +1251,29 @@ function JournalPage({
     borderRadius: "999px",
     background: "linear-gradient(135deg, #2563eb 0%, #22c55e 100%)",
     boxShadow: "0 0 0 5px rgba(37, 99, 235, 0.1)"
+  };
+
+  const accordionTitleStyle = (active) => ({
+    ...sectionTitle,
+    width: "100%",
+    justifyContent: "space-between",
+    cursor: "pointer",
+    marginTop: "16px",
+    color: active ? "#1d4ed8" : "#334155",
+    background: active ? sectionTitle.background : "linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)"
+  });
+
+  const accordionIconStyle = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "24px",
+    height: "24px",
+    borderRadius: "999px",
+    background: "#dbeafe",
+    color: "#1d4ed8",
+    fontSize: "16px",
+    fontWeight: "900"
   };
 
   const managerBox = {
@@ -1455,112 +1489,126 @@ function JournalPage({
           </div>
         )}
 
-        <div style={{ ...sectionTitle, marginTop: "16px" }}>
-          <span style={sectionTitleDot} />
-          <span>Mindset Snapshot</span>
-        </div>
+        <button type="button" onClick={() => toggleFormSection("mindset")} style={accordionTitleStyle(expandedFormSections.mindset)}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+            <span style={sectionTitleDot} />
+            <span>Mindset Snapshot</span>
+          </span>
+          <span style={accordionIconStyle}>{expandedFormSections.mindset ? "-" : "+"}</span>
+        </button>
 
-        <div style={row}>
-          <div style={field}>
-            <label style={labelStyle}>Emotion Before Trade</label>
-            <select name="before" value={form.before} onChange={handleChange} style={input}>
-              <option value="">Select emotion</option>
-              {emotions.map((emotion) => (
-                <option key={emotion.id} value={emotion.name}>
-                  {emotion.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label style={labelStyle}>Emotion During Trade</label>
-            <select name="during" value={form.during} onChange={handleChange} style={input}>
-              <option value="">Select emotion</option>
-              {emotions.map((emotion) => (
-                <option key={emotion.id} value={emotion.name}>
-                  {emotion.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div style={row}>
-          <div style={field}>
-            <label style={labelStyle}>Emotion After Trade</label>
-            <select name="after" value={form.after} onChange={handleChange} style={input}>
-              <option value="">Select emotion</option>
-              {emotions.map((emotion) => (
-                <option key={emotion.id} value={emotion.name}>
-                  {emotion.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div style={field}>
-            <label style={labelStyle}>Emotion Library</label>
-            <button
-              type="button"
-              style={{ ...btn, background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)", color: "white", height: "48px" }}
-              onClick={() => setShowEmotionBox(!showEmotionBox)}
-            >
-              Add Emotion
-            </button>
-          </div>
-        </div>
-
-        {showEmotionBox && (
-          <div style={managerBox}>
-            <div style={managerRow}>
-              <input value={newEmotion} onChange={(e) => setNewEmotion(e.target.value)} placeholder="Add a new emotion" style={input} />
-              <button type="button" onClick={addEmotion} style={{ ...btn, background: "#2563eb", color: "white" }}>
-                Add
-              </button>
+        {expandedFormSections.mindset && (
+          <>
+            <div style={row}>
+              <div style={field}>
+                <label style={labelStyle}>Emotion Before Trade</label>
+                <select name="before" value={form.before} onChange={handleChange} style={input}>
+                  <option value="">Select emotion</option>
+                  {emotions.map((emotion) => (
+                    <option key={emotion.id} value={emotion.name}>
+                      {emotion.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div style={field}>
+                <label style={labelStyle}>Emotion During Trade</label>
+                <select name="during" value={form.during} onChange={handleChange} style={input}>
+                  <option value="">Select emotion</option>
+                  {emotions.map((emotion) => (
+                    <option key={emotion.id} value={emotion.name}>
+                      {emotion.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            <div style={chipList}>
-              {emotions.map((emotion) => (
-                <div key={emotion.id} style={chip}>
-                  <span>{emotion.name}</span>
-                  <button type="button" onClick={() => deleteEmotion(emotion.id)} style={chipDelete}>
-                    X
+            <div style={row}>
+              <div style={field}>
+                <label style={labelStyle}>Emotion After Trade</label>
+                <select name="after" value={form.after} onChange={handleChange} style={input}>
+                  <option value="">Select emotion</option>
+                  {emotions.map((emotion) => (
+                    <option key={emotion.id} value={emotion.name}>
+                      {emotion.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div style={field}>
+                <label style={labelStyle}>Emotion Library</label>
+                <button
+                  type="button"
+                  style={{ ...btn, background: "linear-gradient(135deg, #7c3aed 0%, #9333ea 100%)", color: "white", height: "48px" }}
+                  onClick={() => setShowEmotionBox(!showEmotionBox)}
+                >
+                  Add Emotion
+                </button>
+              </div>
+            </div>
+
+            {showEmotionBox && (
+              <div style={managerBox}>
+                <div style={managerRow}>
+                  <input value={newEmotion} onChange={(e) => setNewEmotion(e.target.value)} placeholder="Add a new emotion" style={input} />
+                  <button type="button" onClick={addEmotion} style={{ ...btn, background: "#2563eb", color: "white" }}>
+                    Add
                   </button>
                 </div>
-              ))}
-            </div>
-          </div>
+
+                <div style={chipList}>
+                  {emotions.map((emotion) => (
+                    <div key={emotion.id} style={chip}>
+                      <span>{emotion.name}</span>
+                      <button type="button" onClick={() => deleteEmotion(emotion.id)} style={chipDelete}>
+                        X
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
 
-        <div style={{ ...sectionTitle, marginTop: "16px" }}>
-          <span style={sectionTitleDot} />
-          <span>Risk and Review</span>
-        </div>
+        <button type="button" onClick={() => toggleFormSection("risk")} style={accordionTitleStyle(expandedFormSections.risk)}>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
+            <span style={sectionTitleDot} />
+            <span>Risk and Review</span>
+          </span>
+          <span style={accordionIconStyle}>{expandedFormSections.risk ? "-" : "+"}</span>
+        </button>
 
-        <div style={row}>
-          <div style={field}>
-            <label style={labelStyle}>Stop Loss</label>
-            <input name="sl" value={form.sl} onChange={handleChange} style={input} placeholder="Planned stop loss" />
-          </div>
-          <div style={field}>
-            <label style={labelStyle}>Target</label>
-            <input name="target" value={form.target} onChange={handleChange} style={input} placeholder="Planned target" />
-          </div>
-        </div>
+        {expandedFormSections.risk && (
+          <>
+            <div style={row}>
+              <div style={field}>
+                <label style={labelStyle}>Stop Loss</label>
+                <input name="sl" value={form.sl} onChange={handleChange} style={input} placeholder="Planned stop loss" />
+              </div>
+              <div style={field}>
+                <label style={labelStyle}>Target</label>
+                <input name="target" value={form.target} onChange={handleChange} style={input} placeholder="Planned target" />
+              </div>
+            </div>
 
-        <div style={row}>
-          <div style={field}>
-            <label style={labelStyle}>Rating (1-10)</label>
-            <input name="rating" value={form.rating} onChange={handleChange} style={input} placeholder="Rate the trade quality" />
-          </div>
-          <div style={field}>
-            <label style={labelStyle}>Is it your planned trade?</label>
-            <select name="plannedTrade" value={form.plannedTrade} onChange={handleChange} style={input}>
-              <option value="">Select answer</option>
-              <option value="Yes">Yes</option>
-              <option value="No">No</option>
-            </select>
-          </div>
-        </div>
+            <div style={row}>
+              <div style={field}>
+                <label style={labelStyle}>Rating (1-10)</label>
+                <input name="rating" value={form.rating} onChange={handleChange} style={input} placeholder="Rate the trade quality" />
+              </div>
+              <div style={field}>
+                <label style={labelStyle}>Is it your planned trade?</label>
+                <select name="plannedTrade" value={form.plannedTrade} onChange={handleChange} style={input}>
+                  <option value="">Select answer</option>
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                </select>
+              </div>
+            </div>
+          </>
+        )}
 
         {errorMessage && (
           <div style={{ marginTop: "18px", padding: "14px 16px", borderRadius: "16px", background: "#fef2f2", color: "#991b1b", border: "1px solid #fecaca" }}>
