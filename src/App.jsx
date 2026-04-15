@@ -1492,7 +1492,7 @@ function JournalPage({
         <button type="button" onClick={() => toggleFormSection("mindset")} style={accordionTitleStyle(expandedFormSections.mindset)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
             <span style={sectionTitleDot} />
-            <span>Mindset Snapshot</span>
+            <span>Capture Mindset Snapshot</span>
           </span>
           <span style={accordionIconStyle}>{expandedFormSections.mindset ? "-" : "+"}</span>
         </button>
@@ -1575,7 +1575,7 @@ function JournalPage({
         <button type="button" onClick={() => toggleFormSection("risk")} style={accordionTitleStyle(expandedFormSections.risk)}>
           <span style={{ display: "inline-flex", alignItems: "center", gap: "10px" }}>
             <span style={sectionTitleDot} />
-            <span>Risk and Review</span>
+            <span>Capture Risk and Review</span>
           </span>
           <span style={accordionIconStyle}>{expandedFormSections.risk ? "-" : "+"}</span>
         </button>
