@@ -1469,7 +1469,6 @@ function MonthlyPnlPage({ trades, btn }) {
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
                     <div style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", lineHeight: 1 }}>{day.dayNumber}</div>
-                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: "700", opacity: 0.9 }}>{getWeekdayFromISODate(day.date).slice(0, 3)}</div>
                   </div>
                   <div>
                     <div style={{ color: "#475569", fontSize: "10px", fontWeight: "800", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "6px", opacity: 0.9 }}>
