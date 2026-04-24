@@ -1265,7 +1265,7 @@ function MonthlyPnlPage({ trades, btn }) {
       return {
         minHeight: "88px",
         borderRadius: "14px",
-        background: "transparent"
+        background: "linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(248, 250, 252, 0.08) 100%)"
       };
     }
 
@@ -1278,7 +1278,8 @@ function MonthlyPnlPage({ trades, btn }) {
         background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between"
+        justifyContent: "space-between",
+        boxShadow: "inset 0 1px 0 rgba(255, 255, 255, 0.7)"
       };
     }
 
@@ -1291,7 +1292,7 @@ function MonthlyPnlPage({ trades, btn }) {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
-      boxShadow: "0 10px 22px rgba(15, 23, 42, 0.05)"
+      boxShadow: "0 10px 22px rgba(15, 23, 42, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
     };
   };
 
@@ -1421,7 +1422,7 @@ function MonthlyPnlPage({ trades, btn }) {
         ))}
       </div>
 
-      <div style={{ ...card, marginBottom: "20px" }}>
+      <div style={{ ...card, marginBottom: "20px", padding: "20px", background: "linear-gradient(180deg, #ffffff 0%, #f4f9ff 100%)" }}>
         <div style={sectionTitle}>
           <span style={sectionTitleDot} />
           <span>Calendar View</span>
@@ -1433,7 +1434,11 @@ function MonthlyPnlPage({ trades, btn }) {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-            gap: "8px"
+            gap: "8px",
+            padding: "10px",
+            borderRadius: "20px",
+            background: "linear-gradient(180deg, rgba(239, 246, 255, 0.9) 0%, rgba(255, 255, 255, 0.95) 100%)",
+            border: "1px solid #dbeafe"
           }}
         >
           {weekdayHeaders.map((weekday) => (
@@ -1445,8 +1450,12 @@ function MonthlyPnlPage({ trades, btn }) {
                 fontWeight: "800",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
-                color: "#64748b",
-                paddingBottom: "2px"
+                color: "#475569",
+                padding: "8px 6px",
+                borderRadius: "999px",
+                background: "rgba(255, 255, 255, 0.88)",
+                border: "1px solid rgba(148, 163, 184, 0.16)",
+                boxShadow: "0 4px 10px rgba(15, 23, 42, 0.03)"
               }}
             >
               {weekday}
@@ -1458,10 +1467,10 @@ function MonthlyPnlPage({ trades, btn }) {
                 <>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
                     <div style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", lineHeight: 1 }}>{day.dayNumber}</div>
-                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: "700" }}>{getWeekdayFromISODate(day.date)}</div>
+                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: "700", opacity: 0.9 }}>{getWeekdayFromISODate(day.date).slice(0, 3)}</div>
                   </div>
                   <div>
-                    <div style={{ color: "#475569", fontSize: "10px", fontWeight: "800", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "6px" }}>
+                    <div style={{ color: "#475569", fontSize: "10px", fontWeight: "800", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "6px", opacity: 0.9 }}>
                       {day.trades} {day.trades === 1 ? "trade" : "trades"}
                     </div>
                     <div style={{ display: "inline-flex", transform: "scale(0.9)", transformOrigin: "left center" }}>
