@@ -1173,12 +1173,40 @@ function MonthlyPnlPage({ trades, btn }) {
   });
 
   const dailyPnlRows = buildDailyPnl(filteredTrades);
+  const dailyPnlMap = dailyPnlRows.reduce((acc, day) => {
+    acc[day.date] = day;
+    return acc;
+  }, {});
   const totalMonthPnl = filteredTrades.reduce((total, trade) => total + safeNumber(trade.pnl), 0);
   const profitableDays = dailyPnlRows.filter((day) => safeNumber(day.pnl) > 0).length;
   const losingDays = dailyPnlRows.filter((day) => safeNumber(day.pnl) < 0).length;
   const bestDay = dailyPnlRows.length ? Math.max(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
   const worstDay = dailyPnlRows.length ? Math.min(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
   const hasActiveFilters = Object.values(filters).some(Boolean);
+  const calendarMonth = filters.month || todayDate.slice(0, 7);
+  const [calendarYearValue, calendarMonthValue] = calendarMonth.split("-").map(Number);
+  const calendarYear = calendarYearValue || Number(todayDate.slice(0, 4));
+  const calendarMonthIndex = (calendarMonthValue || Number(todayDate.slice(5, 7))) - 1;
+  const firstDayOfMonth = new Date(calendarYear, calendarMonthIndex, 1);
+  const daysInMonth = new Date(calendarYear, calendarMonthIndex + 1, 0).getDate();
+  const calendarDays = [];
+
+  for (let index = 0; index < firstDayOfMonth.getDay(); index += 1) {
+    calendarDays.push(null);
+  }
+
+  for (let dayNumber = 1; dayNumber <= daysInMonth; dayNumber += 1) {
+    const isoDate = `${calendarYear}-${String(calendarMonthIndex + 1).padStart(2, "0")}-${String(dayNumber).padStart(2, "0")}`;
+    const dayStats = dailyPnlMap[isoDate];
+    const dayTrades = filteredTrades.filter((trade) => trade.date === isoDate).length;
+
+    calendarDays.push({
+      date: isoDate,
+      dayNumber,
+      pnl: dayStats ? safeNumber(dayStats.pnl) : 0,
+      trades: dayTrades
+    });
+  }
 
   const card = {
     border: "1px solid #dcdde1",
@@ -1229,6 +1257,42 @@ function MonthlyPnlPage({ trades, btn }) {
     background: "#ffffff",
     color: "#0f172a",
     boxSizing: "border-box"
+  };
+
+  const weekdayHeaders = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const getCalendarCellStyle = (day) => {
+    if (!day) {
+      return {
+        minHeight: "126px",
+        borderRadius: "18px",
+        background: "transparent"
+      };
+    }
+
+    if (day.trades === 0) {
+      return {
+        minHeight: "126px",
+        borderRadius: "18px",
+        padding: "14px",
+        border: "1px solid #e2e8f0",
+        background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between"
+      };
+    }
+
+    return {
+      minHeight: "126px",
+      borderRadius: "18px",
+      padding: "14px",
+      border: day.pnl >= 0 ? "1px solid #86efac" : "1px solid #fca5a5",
+      background: day.pnl >= 0 ? "linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%)" : "linear-gradient(180deg, #fff1f2 0%, #fee2e2 100%)",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-between",
+      boxShadow: "0 10px 22px rgba(15, 23, 42, 0.05)"
+    };
   };
 
   return (
@@ -1360,49 +1424,60 @@ function MonthlyPnlPage({ trades, btn }) {
       <div style={{ ...card, marginBottom: "20px" }}>
         <div style={sectionTitle}>
           <span style={sectionTitleDot} />
-          <span>Day Wise Chart</span>
+          <span>Calendar View</span>
         </div>
         <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
-          Each bar represents the total P&amp;L for one day in the selected month.
+          Each box shows the total P&amp;L and trade count for that date in the selected month.
         </div>
-        <BarChart data={dailyPnlRows} />
-      </div>
-
-      <div style={tableWrapperStyle}>
-        <table style={{ ...tableStyle, minWidth: "760px" }}>
-          <thead>
-            <tr style={tableHeadRowStyle}>
-              <th style={tableHeadCellStyle}>Date</th>
-              <th style={tableHeadCellStyle}>Weekday</th>
-              <th style={tableHeadCellStyle}>Trades</th>
-              <th style={tableHeadCellStyle}>Net P&amp;L</th>
-            </tr>
-          </thead>
-          <tbody>
-            {dailyPnlRows.length === 0 ? (
-              <tr>
-                <td colSpan="4" style={{ ...mutedCellStyle, padding: "18px 16px" }}>
-                  No trades found for the selected month and filters.
-                </td>
-              </tr>
-            ) : (
-              dailyPnlRows.map((day, index) => {
-                const tradesOnDay = filteredTrades.filter((trade) => trade.date === day.date).length;
-
-                return (
-                  <tr key={day.date} style={getStripedRowStyle(index)}>
-                    <td style={tableBodyCellStyle}>{day.date}</td>
-                    <td style={tableBodyCellStyle}>{getWeekdayFromISODate(day.date)}</td>
-                    <td style={tableBodyCellStyle}>{tradesOnDay}</td>
-                    <td style={tableBodyCellStyle}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+            gap: "12px"
+          }}
+        >
+          {weekdayHeaders.map((weekday) => (
+            <div
+              key={weekday}
+              style={{
+                textAlign: "center",
+                fontSize: "12px",
+                fontWeight: "800",
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: "#64748b",
+                paddingBottom: "4px"
+              }}
+            >
+              {weekday}
+            </div>
+          ))}
+          {calendarDays.map((day, index) => (
+            <div key={day ? day.date : `blank-${index}`} style={getCalendarCellStyle(day)}>
+              {day ? (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
+                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a" }}>{day.dayNumber}</div>
+                    <div style={{ fontSize: "11px", color: "#64748b", fontWeight: "700" }}>{getWeekdayFromISODate(day.date)}</div>
+                  </div>
+                  <div>
+                    <div style={{ color: "#475569", fontSize: "11px", fontWeight: "800", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "8px" }}>
+                      {day.trades} {day.trades === 1 ? "trade" : "trades"}
+                    </div>
+                    <div style={{ display: "inline-flex" }}>
                       <span style={getPnlBadgeStyle(day.pnl)}>{formatNumber(day.pnl)}</span>
-                    </td>
-                  </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                    </div>
+                  </div>
+                </>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        {dailyPnlRows.length === 0 && (
+          <div style={{ ...mutedCellStyle, padding: "18px 16px", textAlign: "center", marginTop: "14px" }}>
+            No trades found for the selected month and filters.
+          </div>
+        )}
       </div>
     </div>
   );
