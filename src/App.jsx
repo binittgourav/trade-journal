@@ -1182,6 +1182,7 @@ function MonthlyPnlPage({ trades, btn }) {
   const losingDays = dailyPnlRows.filter((day) => safeNumber(day.pnl) < 0).length;
   const bestDay = dailyPnlRows.length ? Math.max(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
   const worstDay = dailyPnlRows.length ? Math.min(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
+  const successRatio = dailyPnlRows.length ? (profitableDays / dailyPnlRows.length) * 100 : 0;
   const hasActiveFilters = Object.values(filters).some(Boolean);
   const calendarMonth = filters.month || todayDate.slice(0, 7);
   const [calendarYearValue, calendarMonthValue] = calendarMonth.split("-").map(Number);
@@ -1412,6 +1413,7 @@ function MonthlyPnlPage({ trades, btn }) {
           { label: "Month Net P&L", value: formatNumber(totalMonthPnl) },
           { label: "Profitable Days", value: profitableDays },
           { label: "Losing Days", value: losingDays },
+          { label: "Success Ratio", value: `${formatNumber(successRatio)}%` },
           { label: "Best Day", value: formatNumber(bestDay) },
           { label: "Worst Day", value: formatNumber(worstDay) }
         ].map((item) => (
