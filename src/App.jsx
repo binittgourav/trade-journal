@@ -1404,8 +1404,8 @@ function MonthlyPnlPage({ trades, btn }) {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-          gap: "14px",
+          gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+          gap: "10px",
           marginBottom: "20px"
         }}
       >
