@@ -1778,7 +1778,25 @@ function JournalPage({
   );
 }
 
-function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPassword, onSubmit, isSubmitting, errorMessage, successMessage }) {
+function AuthPage({
+  authMode,
+  setAuthMode,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  onSubmit,
+  isSubmitting,
+  errorMessage,
+  successMessage
+}) {
+  const submitOnEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      onSubmit();
+    }
+  };
+
   const card = {
     maxWidth: "460px",
     margin: "80px auto",
@@ -1833,7 +1851,11 @@ function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPasswor
         <p style={{ color: "#475569", lineHeight: 1.6, fontSize: "14px", marginTop: "10px" }}>
           {authMode === "signin"
             ? "Sign in to access your personal journal, analytics, and cloud-saved trades."
-            : "Create your account so your trades are stored online and available from any device."}
+            : authMode === "signup"
+              ? "Create your account so your trades are stored online and available from any device."
+              : authMode === "forgot"
+                ? "Enter your email and we will send you a password reset link."
+                : "Enter your new password to finish resetting your account."}
         </p>
 
         {errorMessage && (
@@ -1848,20 +1870,76 @@ function AuthPage({ authMode, setAuthMode, email, setEmail, password, setPasswor
           </div>
         )}
 
-        <div style={{ display: "grid", gap: "14px", marginTop: "20px" }}>
-          <input type="email" placeholder="Email address" value={email} onChange={(e) => setEmail(e.target.value)} style={input} />
-          <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={input} />
-          <button type="button" onClick={onSubmit} disabled={isSubmitting} style={{ ...primaryButton, opacity: isSubmitting ? 0.7 : 1 }}>
-            {isSubmitting ? "Please wait..." : authMode === "signin" ? "Sign In" : "Create Account"}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            onSubmit();
+          }}
+          style={{ display: "grid", gap: "14px", marginTop: "20px" }}
+        >
+          <input
+            type="email"
+            placeholder="Email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={submitOnEnter}
+            style={input}
+          />
+          {authMode !== "forgot" && (
+            <input
+              type="password"
+              placeholder={authMode === "reset" ? "New password" : "Password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={submitOnEnter}
+              style={input}
+            />
+          )}
+          <button type="submit" disabled={isSubmitting} style={{ ...primaryButton, opacity: isSubmitting ? 0.7 : 1 }}>
+            {isSubmitting
+              ? "Please wait..."
+              : authMode === "signin"
+                ? "Sign In"
+                : authMode === "signup"
+                  ? "Create Account"
+                  : authMode === "forgot"
+                    ? "Send Reset Link"
+                    : "Update Password"}
           </button>
-        </div>
+        </form>
 
         <div style={{ marginTop: "18px", fontSize: "14px", color: "#475569" }}>
-          {authMode === "signin" ? "New here?" : "Already have an account?"}{" "}
-          <button type="button" style={ghostButton} onClick={() => setAuthMode(authMode === "signin" ? "signup" : "signin")}>
-            {authMode === "signin" ? "Create an account" : "Sign in"}
-          </button>
+          {authMode === "signin" ? (
+            <>
+              New here?{" "}
+              <button type="button" style={ghostButton} onClick={() => setAuthMode("signup")}>
+                Create an account
+              </button>
+            </>
+          ) : authMode === "signup" ? (
+            <>
+              Already have an account?{" "}
+              <button type="button" style={ghostButton} onClick={() => setAuthMode("signin")}>
+                Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              Back to{" "}
+              <button type="button" style={ghostButton} onClick={() => setAuthMode("signin")}>
+                Sign in
+              </button>
+            </>
+          )}
         </div>
+
+        {authMode === "signin" && (
+          <div style={{ marginTop: "10px" }}>
+            <button type="button" style={ghostButton} onClick={() => setAuthMode("forgot")}>
+              Forgot password?
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2203,10 +2281,18 @@ export default function App() {
 
     const searchParams = new URLSearchParams(window.location.search);
 
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const recoveryType = hashParams.get("type");
+
     if (searchParams.get("verified") === "1") {
       setAuthMode("signin");
       setSuccessMessage("Email has been verified. You can sign in now.");
       window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    if (recoveryType === "recovery") {
+      setAuthMode("reset");
+      setSuccessMessage("Recovery link verified. Enter your new password.");
     }
 
     let isMounted = true;
@@ -2230,7 +2316,7 @@ export default function App() {
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
       setSession(nextSession ?? null);
       setTrades([]);
       setStrategies([]);
@@ -2238,6 +2324,11 @@ export default function App() {
       setForm(emptyForm);
       setEditingTradeId(null);
       setErrorMessage("");
+
+      if (event === "PASSWORD_RECOVERY") {
+        setAuthMode("reset");
+        setSuccessMessage("Recovery link verified. Enter your new password.");
+      }
 
       if (nextSession?.user?.id) {
         setSuccessMessage("");
@@ -2279,8 +2370,13 @@ export default function App() {
       return;
     }
 
-    if (!email.trim() || !password.trim()) {
-      setErrorMessage("Enter your email and password.");
+    if (!email.trim()) {
+      setErrorMessage("Enter your email.");
+      return;
+    }
+
+    if (authMode !== "forgot" && !password.trim()) {
+      setErrorMessage(authMode === "reset" ? "Enter your new password." : "Enter your email and password.");
       return;
     }
 
@@ -2288,18 +2384,25 @@ export default function App() {
     setErrorMessage("");
     setSuccessMessage("");
 
-    const authAction =
-      authMode === "signin"
-        ? supabase.auth.signInWithPassword({ email: email.trim(), password })
-        : supabase.auth.signUp({
-            email: email.trim(),
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/?verified=1`
-            }
-          });
+    let error = null;
 
-    const { error } = await authAction;
+    if (authMode === "signin") {
+      ({ error } = await supabase.auth.signInWithPassword({ email: email.trim(), password }));
+    } else if (authMode === "signup") {
+      ({ error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/?verified=1`
+        }
+      }));
+    } else if (authMode === "forgot") {
+      ({ error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: window.location.origin
+      }));
+    } else if (authMode === "reset") {
+      ({ error } = await supabase.auth.updateUser({ password }));
+    }
 
     setIsSaving(false);
 
@@ -2310,6 +2413,18 @@ export default function App() {
 
     if (authMode === "signup") {
       setSuccessMessage("Account created. Check your email to verify your account.");
+      return;
+    }
+
+    if (authMode === "forgot") {
+      setSuccessMessage("Password reset link sent. Check your email.");
+      return;
+    }
+
+    if (authMode === "reset") {
+      setSuccessMessage("Password updated. You can sign in now.");
+      setPassword("");
+      setAuthMode("signin");
     }
   };
 
@@ -2610,7 +2725,7 @@ export default function App() {
     );
   }
 
-  if (!session) {
+  if (!session || authMode === "reset") {
     return (
       <AuthPage
         authMode={authMode}
