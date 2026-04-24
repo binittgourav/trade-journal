@@ -1154,6 +1154,260 @@ function AnalyticsPage({ trades, btn }) {
   );
 }
 
+function MonthlyPnlPage({ trades, btn }) {
+  const [filters, setFilters] = useState({
+    month: todayDate.slice(0, 7),
+    instrument: "",
+    strategy: ""
+  });
+
+  const instruments = [...new Set(trades.map((trade) => (trade.instrument || "").trim()).filter(Boolean))].sort();
+  const strategies = [...new Set(trades.map((trade) => (trade.strategy || "").trim()).filter(Boolean))].sort();
+
+  const filteredTrades = trades.filter((trade) => {
+    const matchesMonth = !filters.month || (trade.date && trade.date.startsWith(filters.month));
+    const matchesInstrument = !filters.instrument || trade.instrument === filters.instrument;
+    const matchesStrategy = !filters.strategy || trade.strategy === filters.strategy;
+
+    return matchesMonth && matchesInstrument && matchesStrategy;
+  });
+
+  const dailyPnlRows = buildDailyPnl(filteredTrades);
+  const totalMonthPnl = filteredTrades.reduce((total, trade) => total + safeNumber(trade.pnl), 0);
+  const profitableDays = dailyPnlRows.filter((day) => safeNumber(day.pnl) > 0).length;
+  const losingDays = dailyPnlRows.filter((day) => safeNumber(day.pnl) < 0).length;
+  const bestDay = dailyPnlRows.length ? Math.max(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
+  const worstDay = dailyPnlRows.length ? Math.min(...dailyPnlRows.map((day) => safeNumber(day.pnl))) : 0;
+  const hasActiveFilters = Object.values(filters).some(Boolean);
+
+  const card = {
+    border: "1px solid #dcdde1",
+    borderRadius: "16px",
+    padding: "18px",
+    background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+    boxShadow: "0 10px 24px rgba(15, 23, 42, 0.05)"
+  };
+
+  const sectionTitle = {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    padding: "12px 14px",
+    borderRadius: "16px",
+    background: "linear-gradient(135deg, #eff6ff 0%, #ffffff 100%)",
+    border: "1px solid #dbeafe",
+    boxShadow: "0 8px 18px rgba(37, 99, 235, 0.06)",
+    fontSize: "13px",
+    fontWeight: "900",
+    color: "#1d4ed8",
+    textTransform: "uppercase",
+    letterSpacing: "0.09em",
+    marginBottom: "14px"
+  };
+
+  const sectionTitleDot = {
+    width: "9px",
+    height: "9px",
+    borderRadius: "999px",
+    background: "linear-gradient(135deg, #2563eb 0%, #22c55e 100%)",
+    boxShadow: "0 0 0 5px rgba(37, 99, 235, 0.1)"
+  };
+
+  const filterLabel = {
+    fontSize: "12px",
+    fontWeight: "600",
+    color: "#475569",
+    marginBottom: "6px"
+  };
+
+  const filterInput = {
+    width: "100%",
+    padding: "12px 14px",
+    border: "1px solid #dbe4f0",
+    borderRadius: "12px",
+    fontSize: "13px",
+    background: "#ffffff",
+    color: "#0f172a",
+    boxSizing: "border-box"
+  };
+
+  return (
+    <div
+      style={{
+        maxWidth: "1200px",
+        margin: "20px auto",
+        background: "linear-gradient(180deg, #ffffff 0%, #f8fbff 100%)",
+        padding: "24px",
+        borderRadius: "24px",
+        fontFamily: "Arial",
+        border: "1px solid #dbeafe",
+        boxShadow: "0 20px 50px rgba(15, 23, 42, 0.07)"
+      }}
+    >
+      <div
+        style={{
+          ...pageHeroInnerStyle,
+          marginBottom: "22px",
+          padding: "28px 18px",
+          borderRadius: "22px",
+          background: "radial-gradient(circle at 50% 0%, rgba(22, 163, 74, 0.14) 0%, rgba(255, 255, 255, 0) 58%), linear-gradient(135deg, #eff6ff 0%, #ffffff 54%, #f0fdf4 100%)",
+          border: "1px solid #dbeafe"
+        }}
+      >
+        <div>
+          <h2 style={pageTitleStyle}>Month Wise P&amp;L</h2>
+          <div style={pageSubtitleStyle}>
+            Review each day&apos;s profit and loss inside a selected month from its own dedicated page.
+          </div>
+        </div>
+      </div>
+
+      <div style={{ ...card, marginBottom: "20px", padding: "16px 18px" }}>
+        <div style={{ position: "relative", marginBottom: "14px", textAlign: "center" }}>
+          <div style={{ maxWidth: "560px", margin: "0 auto" }}>
+            <div style={{ fontSize: "16px", fontWeight: "700", color: "#0f172a" }}>Filters</div>
+            <div style={{ color: "#64748b", fontSize: "13px", marginTop: "4px" }}>
+              Choose a month and optionally narrow the view by instrument or strategy used.
+            </div>
+          </div>
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={() => setFilters({ month: todayDate.slice(0, 7), instrument: "", strategy: "" })}
+              style={{ ...btn, position: "absolute", right: 0, top: 0, background: "#e2e8f0", color: "#1e293b", boxShadow: "none" }}
+            >
+              Reset Filters
+            </button>
+          )}
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "14px"
+          }}
+        >
+          <div>
+            <div style={filterLabel}>Month</div>
+            <input
+              type="month"
+              value={filters.month}
+              max={todayDate.slice(0, 7)}
+              onChange={(e) => setFilters({ ...filters, month: e.target.value })}
+              style={filterInput}
+            />
+          </div>
+          <div>
+            <div style={filterLabel}>Instrument</div>
+            <select
+              value={filters.instrument}
+              onChange={(e) => setFilters({ ...filters, instrument: e.target.value })}
+              style={filterInput}
+            >
+              <option value="">All Instruments</option>
+              {instruments.map((instrument) => (
+                <option key={instrument} value={instrument}>
+                  {instrument}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <div style={filterLabel}>Strategy Used</div>
+            <select
+              value={filters.strategy}
+              onChange={(e) => setFilters({ ...filters, strategy: e.target.value })}
+              style={filterInput}
+            >
+              <option value="">All Strategies</option>
+              {strategies.map((strategy) => (
+                <option key={strategy} value={strategy}>
+                  {strategy}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div style={{ marginTop: "12px", color: "#64748b", fontSize: "13px" }}>
+          Showing <strong style={{ color: "#0f172a" }}>{filteredTrades.length}</strong> trades across <strong style={{ color: "#0f172a" }}>{dailyPnlRows.length}</strong> trading days
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: "14px",
+          marginBottom: "20px"
+        }}
+      >
+        {[
+          { label: "Month Net P&L", value: formatNumber(totalMonthPnl) },
+          { label: "Profitable Days", value: profitableDays },
+          { label: "Losing Days", value: losingDays },
+          { label: "Best Day", value: formatNumber(bestDay) },
+          { label: "Worst Day", value: formatNumber(worstDay) }
+        ].map((item) => (
+          <div key={item.label} style={{ ...card, padding: "16px" }}>
+            <div style={{ color: "#64748b", fontSize: "11px", fontWeight: "800", letterSpacing: "0.08em", textTransform: "uppercase" }}>{item.label}</div>
+            <div style={{ marginTop: "8px", color: "#0f172a", fontSize: "22px", fontWeight: "800" }}>{item.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ ...card, marginBottom: "20px" }}>
+        <div style={sectionTitle}>
+          <span style={sectionTitleDot} />
+          <span>Day Wise Chart</span>
+        </div>
+        <div style={{ color: "#64748b", fontSize: "14px", marginBottom: "14px" }}>
+          Each bar represents the total P&amp;L for one day in the selected month.
+        </div>
+        <BarChart data={dailyPnlRows} />
+      </div>
+
+      <div style={tableWrapperStyle}>
+        <table style={{ ...tableStyle, minWidth: "760px" }}>
+          <thead>
+            <tr style={tableHeadRowStyle}>
+              <th style={tableHeadCellStyle}>Date</th>
+              <th style={tableHeadCellStyle}>Weekday</th>
+              <th style={tableHeadCellStyle}>Trades</th>
+              <th style={tableHeadCellStyle}>Net P&amp;L</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dailyPnlRows.length === 0 ? (
+              <tr>
+                <td colSpan="4" style={{ ...mutedCellStyle, padding: "18px 16px" }}>
+                  No trades found for the selected month and filters.
+                </td>
+              </tr>
+            ) : (
+              dailyPnlRows.map((day, index) => {
+                const tradesOnDay = filteredTrades.filter((trade) => trade.date === day.date).length;
+
+                return (
+                  <tr key={day.date} style={getStripedRowStyle(index)}>
+                    <td style={tableBodyCellStyle}>{day.date}</td>
+                    <td style={tableBodyCellStyle}>{getWeekdayFromISODate(day.date)}</td>
+                    <td style={tableBodyCellStyle}>{tradesOnDay}</td>
+                    <td style={tableBodyCellStyle}>
+                      <span style={getPnlBadgeStyle(day.pnl)}>{formatNumber(day.pnl)}</span>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function JournalPage({
   userEmail,
   form,
@@ -1980,7 +2234,8 @@ function SetupRequiredPage() {
 function AppShell({ page, setPage, userEmail, onSignOut, children }) {
   const navItems = [
     { key: "journal", label: "Journal" },
-    { key: "analytics", label: "Analytics" }
+    { key: "analytics", label: "Analytics" },
+    { key: "monthlyPnl", label: "Month Wise P&L" }
   ];
 
   const Icon = ({ name }) => {
@@ -2779,6 +3034,10 @@ export default function App() {
 
   if (page === "analytics") {
     activePage = <AnalyticsPage trades={trades} btn={btn} />;
+  }
+
+  if (page === "monthlyPnl") {
+    activePage = <MonthlyPnlPage trades={trades} btn={btn} />;
   }
 
   if (page === "profile") {
