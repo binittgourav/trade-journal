@@ -1263,17 +1263,17 @@ function MonthlyPnlPage({ trades, btn }) {
   const getCalendarCellStyle = (day) => {
     if (!day) {
       return {
-        minHeight: "126px",
-        borderRadius: "18px",
+        minHeight: "88px",
+        borderRadius: "14px",
         background: "transparent"
       };
     }
 
     if (day.trades === 0) {
       return {
-        minHeight: "126px",
-        borderRadius: "18px",
-        padding: "14px",
+        minHeight: "88px",
+        borderRadius: "14px",
+        padding: "10px",
         border: "1px solid #e2e8f0",
         background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
         display: "flex",
@@ -1283,9 +1283,9 @@ function MonthlyPnlPage({ trades, btn }) {
     }
 
     return {
-      minHeight: "126px",
-      borderRadius: "18px",
-      padding: "14px",
+      minHeight: "88px",
+      borderRadius: "14px",
+      padding: "10px",
       border: day.pnl >= 0 ? "1px solid #86efac" : "1px solid #fca5a5",
       background: day.pnl >= 0 ? "linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%)" : "linear-gradient(180deg, #fff1f2 0%, #fee2e2 100%)",
       display: "flex",
@@ -1433,7 +1433,7 @@ function MonthlyPnlPage({ trades, btn }) {
           style={{
             display: "grid",
             gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-            gap: "12px"
+            gap: "8px"
           }}
         >
           {weekdayHeaders.map((weekday) => (
@@ -1441,12 +1441,12 @@ function MonthlyPnlPage({ trades, btn }) {
               key={weekday}
               style={{
                 textAlign: "center",
-                fontSize: "12px",
+                fontSize: "11px",
                 fontWeight: "800",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
                 color: "#64748b",
-                paddingBottom: "4px"
+                paddingBottom: "2px"
               }}
             >
               {weekday}
@@ -1456,16 +1456,16 @@ function MonthlyPnlPage({ trades, btn }) {
             <div key={day ? day.date : `blank-${index}`} style={getCalendarCellStyle(day)}>
               {day ? (
                 <>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "8px" }}>
-                    <div style={{ fontSize: "18px", fontWeight: "800", color: "#0f172a" }}>{day.dayNumber}</div>
-                    <div style={{ fontSize: "11px", color: "#64748b", fontWeight: "700" }}>{getWeekdayFromISODate(day.date)}</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
+                    <div style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", lineHeight: 1 }}>{day.dayNumber}</div>
+                    <div style={{ fontSize: "10px", color: "#64748b", fontWeight: "700" }}>{getWeekdayFromISODate(day.date)}</div>
                   </div>
                   <div>
-                    <div style={{ color: "#475569", fontSize: "11px", fontWeight: "800", letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "8px" }}>
+                    <div style={{ color: "#475569", fontSize: "10px", fontWeight: "800", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "6px" }}>
                       {day.trades} {day.trades === 1 ? "trade" : "trades"}
                     </div>
-                    <div style={{ display: "inline-flex" }}>
-                      <span style={getPnlBadgeStyle(day.pnl)}>{formatNumber(day.pnl)}</span>
+                    <div style={{ display: "inline-flex", transform: "scale(0.9)", transformOrigin: "left center" }}>
+                      <span style={{ ...getPnlBadgeStyle(day.pnl), minWidth: "72px", padding: "4px 10px", fontSize: "11px" }}>{formatNumber(day.pnl)}</span>
                     </div>
                   </div>
                 </>
