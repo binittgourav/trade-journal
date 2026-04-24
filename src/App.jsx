@@ -1255,7 +1255,7 @@ function MonthlyPnlPage({ trades, btn }) {
         }}
       >
         <div>
-          <h2 style={pageTitleStyle}>Month Wise P&amp;L</h2>
+          <h2 style={pageTitleStyle}>Date Wise P&amp;L</h2>
           <div style={pageSubtitleStyle}>
             Review each day&apos;s profit and loss inside a selected month from its own dedicated page.
           </div>
@@ -2235,7 +2235,7 @@ function AppShell({ page, setPage, userEmail, onSignOut, children }) {
   const navItems = [
     { key: "journal", label: "Journal" },
     { key: "analytics", label: "Analytics" },
-    { key: "monthlyPnl", label: "Month Wise P&L" }
+    { key: "monthlyPnl", label: "Date Wise P&L" }
   ];
 
   const Icon = ({ name }) => {
