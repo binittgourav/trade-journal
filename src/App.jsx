@@ -1470,13 +1470,13 @@ function MonthlyPnlPage({ trades, btn }) {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: "6px" }}>
                     <div style={{ fontSize: "16px", fontWeight: "800", color: "#0f172a", lineHeight: 1 }}>{day.dayNumber}</div>
                   </div>
-                  <div>
-                    <div style={{ color: "#475569", fontSize: "10px", fontWeight: "800", letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "6px", opacity: 0.9 }}>
-                      {day.trades} {day.trades === 1 ? "trade" : "trades"}
+                  <div style={{ flex: 1, display: "grid", placeItems: "center" }}>
+                    <div style={{ fontSize: "17px", fontWeight: "800", color: day.pnl >= 0 ? "#15803d" : "#b91c1c", lineHeight: 1.1 }}>
+                      {formatNumber(day.pnl)}
                     </div>
-                    <div style={{ display: "inline-flex", transform: "scale(0.9)", transformOrigin: "left center" }}>
-                      <span style={{ ...getPnlBadgeStyle(day.pnl), minWidth: "72px", padding: "4px 10px", fontSize: "11px" }}>{formatNumber(day.pnl)}</span>
-                    </div>
+                  </div>
+                  <div style={{ color: "#475569", fontSize: "9px", fontWeight: "700", letterSpacing: "0.03em", textTransform: "uppercase", opacity: 0.85 }}>
+                    {day.trades} {day.trades === 1 ? "trade" : "trades"}
                   </div>
                 </>
               ) : null}
